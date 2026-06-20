@@ -1,7 +1,9 @@
 const sampleMessages = {
     bank: "THÔNG BÁO: Tài khoản ngân hàng của quý khách đang bị khóa do nghi ngờ giao dịch bất thường. Vui lòng đăng nhập ngay tại https://secure-vcb-xacminh.com và nhập OTP để xác minh trong 15 phút.",
-    police: "Tôi là cán bộ công an. Số căn cước của anh/chị liên quan đến đường dây rửa tiền. Để chứng minh vô tội, chuyển ngay 35 triệu đồng vào tài khoản tạm giữ và không được báo cho người thân.",
-    prize: "Chúc mừng thuê bao của bạn đã trúng thưởng iPhone 15 Pro Max. Bấm vào bit.ly/nhan-qua-ngay và đóng phí hồ sơ 299.000đ để nhận quà trong hôm nay."
+    police:
+        "Tôi là cán bộ công an. Số căn cước của anh/chị liên quan đến đường dây rửa tiền. Để chứng minh vô tội, chuyển ngay 35 triệu đồng vào tài khoản tạm giữ và không được báo cho người thân.",
+    prize:
+        "Chúc mừng thuê bao của bạn đã trúng thưởng iPhone 15 Pro Max. Bấm vào bit.ly/nhan-qua-ngay và đóng phí hồ sơ 299.000đ để nhận quà trong hôm nay.",
 };
 
 // Cau hinh chinh va cac khoa localStorage dung trong trinh duyet.
@@ -10,87 +12,110 @@ const MAX_HISTORY = 10;
 const MAX_LENGTH = 5000;
 const THEME_STORAGE = "scamcheck_theme";
 const TUTORIAL_STORAGE = "scamcheck_tutorial_seen";
-const PRODUCT_URL = "https://scamcheck-hacam.onrender.com/#check";
 const TRAINING_DATA_URL = "data/training-messages.json";
 const TRAINING_POOL_COUNT = 15;
 const TRAINING_QUIZ_COUNT = 10;
-const LINK_PATTERN = /(?:https?:\/\/|www\.)[^\s<>"'`]+|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com\.vn|net\.vn|org\.vn|edu\.vn|gov\.vn|vn|com|net|org|info|biz|io|co|me|app|dev|link|ly|gl|cc|top|xyz|shop|site|online|icu|click|live|asia|store|vip|cloud|at|so|id|in|de|fr|to|be|am|sh|gd|do|us)(?:\/[^\s<>"'`]*)?/gi;
-const KNOWN_PUBLIC_SUFFIXES = ["com.vn", "net.vn", "org.vn", "edu.vn", "gov.vn", "co.uk", "com.sg", "co.id", "co.th", "com.au", "co.jp"];
+const LINK_PATTERN =
+    /(?:https?:\/\/|www\.)[^\s<>"'`]+|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com\.vn|net\.vn|org\.vn|edu\.vn|gov\.vn|vn|com|net|org|info|biz|io|co|me|app|dev|link|ly|gl|cc|top|xyz|shop|site|online|icu|click|live|asia|store|vip|cloud|at|so|id|in)(?:\/[^\s<>"'`]*)?/gi;
+const KNOWN_PUBLIC_SUFFIXES = [
+    "com.vn",
+    "net.vn",
+    "org.vn",
+    "edu.vn",
+    "gov.vn",
+];
 const SHORTENER_DOMAINS = new Set([
-    "bit.ly", "bitly.com", "tinyurl.com", "goo.gl", "t.co", "is.gd", "ow.ly",
-    "rebrand.ly", "cutt.ly", "s.id", "shorturl.at", "bom.so", "vnurl.net",
-    "short.io", "lnkd.in", "tiny.cc", "buff.ly", "trib.al", "soo.gd",
-    "chilp.it", "shorte.st", "adf.ly", "bit.do", "rb.gy", "dub.sh",
-    "cutt.us", "urlz.fr", "v.gd", "qrco.de", "shorturl.asia", "gg.gg",
-    "surl.li", "linktr.ee", "taplink.cc", "l.facebook.com", "zpr.io"
+    "bit.ly",
+    "bitly.com",
+    "tinyurl.com",
+    "goo.gl",
+    "t.co",
+    "is.gd",
+    "ow.ly",
+    "rebrand.ly",
+    "cutt.ly",
+    "s.id",
+    "shorturl.at",
+    "bom.so",
+    "vnurl.net",
+    "short.io",
+    "lnkd.in",
 ]);
 const OFFICIAL_ORGANIZATIONS = [
-    { name: "Vietcombank", aliases: ["vietcombank", "vcb"], domains: ["vietcombank.com.vn", "vcb.com.vn"] },
-    { name: "VietinBank", aliases: ["vietinbank", "vietin"], domains: ["vietinbank.vn"] },
+    {
+        name: "Vietcombank",
+        aliases: ["vietcombank", "vcb"],
+        domains: ["vietcombank.com.vn", "vcb.com.vn"],
+    },
+    {
+        name: "VietinBank",
+        aliases: ["vietinbank", "vietin"],
+        domains: ["vietinbank.vn"],
+    },
     { name: "BIDV", aliases: ["bidv"], domains: ["bidv.com.vn"] },
-    { name: "Techcombank", aliases: ["techcombank", "tcb"], domains: ["techcombank.com"] },
+    {
+        name: "Techcombank",
+        aliases: ["techcombank", "tcb"],
+        domains: ["techcombank.com"],
+    },
     { name: "Agribank", aliases: ["agribank"], domains: ["agribank.com.vn"] },
     { name: "MBBank", aliases: ["mbbank"], domains: ["mbbank.com.vn"] },
     { name: "ACB", aliases: ["acb"], domains: ["acb.com.vn"] },
     { name: "VPBank", aliases: ["vpbank"], domains: ["vpbank.com.vn"] },
     { name: "TPBank", aliases: ["tpbank"], domains: ["tpb.vn", "tpbank.vn"] },
-    { name: "Sacombank", aliases: ["sacombank", "stb"], domains: ["sacombank.com.vn"] },
-    { name: "VIB", aliases: ["vib"], domains: ["vib.com.vn"] },
-    { name: "HDBank", aliases: ["hdbank", "hdb"], domains: ["hdbank.com.vn"] },
-    { name: "MSB", aliases: ["msb"], domains: ["msb.com.vn"] },
-    { name: "OCB", aliases: ["ocb"], domains: ["ocb.com.vn"] },
-    { name: "SHB", aliases: ["shb"], domains: ["shb.com.vn"] },
-    { name: "SeABank", aliases: ["seabank"], domains: ["seabank.com.vn"] },
-    { name: "LPBank", aliases: ["lpbank", "lienvietpostbank"], domains: ["lpbank.com.vn"] },
-    { name: "Eximbank", aliases: ["eximbank", "eib"], domains: ["eximbank.com.vn"] },
-    { name: "Nam A Bank", aliases: ["namabank"], domains: ["namabank.com.vn"] },
-    { name: "ABBank", aliases: ["abbank"], domains: ["abbank.vn"] },
-    { name: "PVcomBank", aliases: ["pvcombank"], domains: ["pvcombank.com.vn"] },
-    { name: "BaoViet Bank", aliases: ["baovietbank"], domains: ["baovietbank.vn"] },
-    { name: "KienlongBank", aliases: ["kienlongbank", "klb"], domains: ["kienlongbank.com"] },
     { name: "MoMo", aliases: ["momo"], domains: ["momo.vn"] },
     { name: "VNPay", aliases: ["vnpay"], domains: ["vnpay.vn"] },
     { name: "ZaloPay", aliases: ["zalopay"], domains: ["zalopay.vn"] },
-    { name: "ShopeePay", aliases: ["shopeepay", "airpay"], domains: ["shopeepay.vn"] },
-    { name: "Viettel Money", aliases: ["viettelmoney"], domains: ["viettelmoney.vn"] },
-    { name: "Payoo", aliases: ["payoo"], domains: ["payoo.vn"] },
-    { name: "Napas", aliases: ["napas"], domains: ["napas.com.vn"] },
-    { name: "Bộ Công an", aliases: ["bocongan", "congan"], domains: ["bocongan.gov.vn"] },
+    {
+        name: "Bộ Công an",
+        aliases: ["bocongan", "congan"],
+        domains: ["bocongan.gov.vn"],
+    },
     { name: "VNeID", aliases: ["vneid"], domains: ["vneid.gov.vn"] },
-    { name: "Cong dich vu cong", aliases: ["dichvucong", "dvc"], domains: ["dichvucong.gov.vn"] },
-    { name: "Thue dien tu", aliases: ["thuedientu", "gdt"], domains: ["thuedientu.gdt.gov.vn", "gdt.gov.vn"] },
-    { name: "Bao hiem xa hoi", aliases: ["baohiemxahoi", "vssid"], domains: ["baohiemxahoi.gov.vn", "vssid.gov.vn"] },
     { name: "VNPost", aliases: ["vnpost"], domains: ["vnpost.vn"] },
-    { name: "Giao Hàng Nhanh", aliases: ["ghn", "giaohangnhanh"], domains: ["ghn.vn"] },
-    { name: "Giao Hàng Tiết Kiệm", aliases: ["ghtk", "giaohangtietkiem"], domains: ["giaohangtietkiem.vn", "ghtk.vn"] },
-    { name: "Viettel Post", aliases: ["viettelpost"], domains: ["viettelpost.com.vn"] },
-    { name: "J&T Express", aliases: ["jtexpress", "jnt"], domains: ["jtexpress.vn"] },
-    { name: "Shopee Express", aliases: ["spx", "shopeeexpress"], domains: ["spx.vn"] },
-    { name: "Shopee", aliases: ["shopee"], domains: ["shopee.vn"] },
-    { name: "Lazada", aliases: ["lazada", "lex"], domains: ["lazada.vn", "lex.vn"] },
-    { name: "Tiki", aliases: ["tiki"], domains: ["tiki.vn"] },
-    { name: "Sendo", aliases: ["sendo"], domains: ["sendo.vn"] },
-    { name: "Ninja Van", aliases: ["ninjavan"], domains: ["ninjavan.co"] },
-    { name: "BEST Express", aliases: ["bestexpress", "bestinc"], domains: ["best-inc.vn"] },
-    { name: "AhaMove", aliases: ["ahamove"], domains: ["ahamove.com"] },
-    { name: "Grab", aliases: ["grab"], domains: ["grab.com"] },
-    { name: "be", aliases: ["be"], domains: ["be.com.vn"] },
-    { name: "DHL", aliases: ["dhl"], domains: ["dhl.com"] },
-    { name: "FedEx", aliases: ["fedex"], domains: ["fedex.com"] },
-    { name: "UPS", aliases: ["ups"], domains: ["ups.com"] },
-    { name: "Viettel", aliases: ["viettel"], domains: ["viettel.vn"] },
-    { name: "MobiFone", aliases: ["mobifone"], domains: ["mobifone.vn"] },
-    { name: "VinaPhone", aliases: ["vinaphone"], domains: ["vinaphone.com.vn"] },
-    { name: "Vietnamobile", aliases: ["vietnamobile"], domains: ["vietnamobile.com.vn"] }
+    {
+        name: "Giao Hàng Nhanh",
+        aliases: ["ghn", "giaohangnhanh"],
+        domains: ["ghn.vn"],
+    },
+    {
+        name: "Giao Hàng Tiết Kiệm",
+        aliases: ["ghtk", "giaohangtietkiem"],
+        domains: ["giaohangtietkiem.vn", "ghtk.vn"],
+    },
+    {
+        name: "Viettel Post",
+        aliases: ["viettelpost"],
+        domains: ["viettelpost.com.vn"],
+    },
+    {
+        name: "J&T Express",
+        aliases: ["jtexpress", "jnt"],
+        domains: ["jtexpress.vn"],
+    },
+    {
+        name: "Shopee Express",
+        aliases: ["spx", "shopeeexpress"],
+        domains: ["spx.vn"],
+    },
 ];
 const SUSPICIOUS_DOMAIN_WORDS = [
-    "xacminh", "capnhat", "baomat", "khoa", "mokhoa", "hotro", "khancap",
-    "kiemtra", "nhanqua", "trungthuong", "thanhtoan", "lephi", "hoantien",
-    "hoso", "dieutra", "baolanh", "dangnhap", "login", "verify", "security",
-    "secure", "unlock", "refund", "claim", "gift", "bonus", "delivery",
-    "tracking", "customs", "tax", "hoanthue", "thongquan", "giaohang",
-    "vandon", "nap", "rut", "giaingan", "vay", "duyetvay", "tracuu",
-    "phatnguoi", "vip", "urgent"
+    "xacminh",
+    "capnhat",
+    "baomat",
+    "khoa",
+    "mokhoa",
+    "hotro",
+    "khancap",
+    "kiemtra",
+    "nhanqua",
+    "trungthuong",
+    "thanhtoan",
+    "lephi",
+    "hoantien",
+    "hoso",
+    "dieutra",
+    "baolanh",
 ];
 
 // Ket qua du phong giu cho giao dien khong bi gay khi AI tra ve sai cau truc.
@@ -100,28 +125,28 @@ const DEFAULT_RESULT = {
     actions: [
         "Không bấm vào liên kết lạ.",
         "Không cung cấp OTP, mật khẩu hoặc thông tin cá nhân.",
-        "Liên hệ kênh chính thức để kiểm tra lại."
+        "Liên hệ kênh chính thức để kiểm tra lại.",
     ],
-    usedFallback: true
+    usedFallback: true,
 };
 
 const RESPONDER_GUIDELINES = {
     none: {
         text: "🟢 <strong>Bác đã xử lý rất an toàn!</strong> Hãy xóa ngay tin nhắn này khỏi điện thoại của bác. Tuyệt đối không bấm hay làm theo bất kỳ hướng dẫn nào từ nguồn gửi đáng ngờ này.",
-        class: "guidance-none"
+        class: "guidance-none",
     },
     clicked: {
         text: "⚠️ <strong>Chỉ dẫn khẩn cấp khi lỡ bấm link:</strong><br>1. Hãy tạm thời <strong>ngắt ngay lập tức kết nối mạng Wi-Fi hoặc 3G/4G</strong> trên điện thoại.<br>2. Tuyệt đối không đăng nhập tài khoản ngân hàng hay ví điện tử vào lúc này.<br>3. Mang điện thoại của bác tới các trung tâm dịch vụ uy tín để kiểm tra, quét mã độc ẩn.",
-        class: "guidance-clicked"
+        class: "guidance-clicked",
     },
     transferred: {
         text: "🚨 <strong>Hành động ngay lập tức - Bác đã chuyển tiền:</strong><br>1. Hãy gọi điện trực tiếp lên <strong>Tổng đài hỗ trợ của ngân hàng bác đang dùng</strong>, yêu cầu hỗ trợ khẩn cấp phong tỏa tài khoản hoặc dòng tiền vừa giao dịch.<br>2. Chụp ảnh lại màn hình giao dịch chuyển khoản đầy đủ thông tin.<br>3. Chuẩn bị bằng chứng và tới ngay đồn Công an gần nhất để làm đơn trình báo lừa đảo.",
-        class: "guidance-transferred"
+        class: "guidance-transferred",
     },
     otp: {
         text: "❌ <strong>Cảnh báo cực kỳ nguy hiểm - Lộ mã xác thực:</strong><br>1. Hãy liên hệ ngay với ngân hàng của bác để <strong>khóa khẩn cấp chức năng giao dịch trực tuyến (Internet Banking)</strong>.<br>2. Đổi mật khẩu tài khoản ngân hàng ngay lập tức trên một thiết bị an toàn khác để bảo toàn số dư.",
-        class: "guidance-otp"
-    }
+        class: "guidance-otp",
+    },
 }; //
 
 // Ham cu tu ban dau, giu lai de tranh pha vo neu file khac dang goi.
@@ -146,132 +171,281 @@ function parseAIResponse(aiText)
     }
 }
 
-
 const FALLBACK_SCAM_LIBRARY = [
-    { id: "bank-account-lock", name: "Khóa tài khoản khẩn cấp", group: "GIẢ NGÂN HÀNG", description: "Kẻ lừa đảo giả danh ngân hàng, tạo cảm giác tài khoản đang gặp nguy hiểm để ép người nhận bấm vào liên kết và nhập thông tin đăng nhập hoặc mã OTP.", exampleMessage: "Tài khoản ngân hàng của quý khách đang bị khóa do phát hiện giao dịch bất thường. Vui lòng xác minh ngay tại https://secure-bank-capnhat.com trong 15 phút." },
-    { id: "bank-otp-verification", name: "Yêu cầu cung cấp OTP", group: "GIẢ NGÂN HÀNG", description: "Tin nhắn yêu cầu người dùng gửi mã OTP, mã xác thực hoặc mật khẩu với lý do hỗ trợ giao dịch.", exampleMessage: "Giao dịch của bạn đang bị treo. Vui lòng gửi lại mã OTP vừa nhận được để nhân viên ngân hàng hoàn tất xác minh." },
-    { id: "bank-fee-refund", name: "Hoàn phí dịch vụ giả", group: "GIẢ NGÂN HÀNG", description: "Kẻ gian hứa hoàn phí, hoàn tiền hoặc nhận ưu đãi ngân hàng để dụ người nhận truy cập trang giả mạo.", exampleMessage: "Bạn được hoàn 680.000đ phí thường niên. Bấm vào https://refund-bank-vn.com và điền thông tin thẻ để nhận tiền." },
-    { id: "bank-fake-loan-approval", name: "Duyệt khoản vay giả", group: "GIẢ NGÂN HÀNG", description: "Tin nhắn báo duyệt vay hoặc tăng hạn mức, sau đó yêu cầu đóng phí hồ sơ trước khi giải ngân.", exampleMessage: "Hồ sơ vay 50.000.000đ đã được duyệt. Đóng phí bảo hiểm 450.000đ tại https://vaynhanh-bankvn.com để giải ngân." },
-    { id: "police-criminal-case", name: "Liên quan vụ án", group: "GIẢ CƠ QUAN CÔNG AN", description: "Đối tượng tự xưng là công an hoặc điều tra viên, nói người nhận liên quan đến vụ án để gây hoảng sợ.", exampleMessage: "Số căn cước của anh/chị có liên quan đến đường dây rửa tiền. Chuyển 30 triệu vào tài khoản tạm giữ để xác minh." },
-    { id: "police-court-summons", name: "Giấy triệu tập giả", group: "GIẢ CƠ QUAN CÔNG AN", description: "Tin nhắn gửi đường dẫn hoặc tệp giả mạo giấy triệu tập, biên bản phạt hoặc lệnh điều tra.", exampleMessage: "Bạn có giấy triệu tập khẩn cấp. Tải hồ sơ tại https://congan-hoso-khan.com để xem lịch làm việc." },
-    { id: "police-sim-lock-warning", name: "Đe dọa khóa SIM vì vi phạm", group: "GIẢ CƠ QUAN CÔNG AN", description: "Kẻ lừa đảo nói số điện thoại vi phạm pháp luật hoặc sắp bị khóa để ép người nhận xác minh qua kênh giả.", exampleMessage: "Số thuê bao của bạn bị ghi nhận vi phạm. Bấm vào https://xacminh-congan24h.com để khai báo trong 2 giờ." },
-    { id: "police-fake-video-call", name: "Gọi video điều tra giả", group: "GIẢ CƠ QUAN CÔNG AN", description: "Đối tượng yêu cầu gọi video, giữ bí mật và quay giấy tờ hoặc ứng dụng ngân hàng để lấy thông tin.", exampleMessage: "Vào cuộc gọi video với điều tra viên ngay. Chuẩn bị CCCD, mở ứng dụng ngân hàng và không tắt máy trong lúc xác minh." },
-    { id: "prize-phone", name: "Trúng điện thoại giá trị cao", group: "TRÚNG THƯỞNG", description: "Tin nhắn thông báo trúng điện thoại hoặc quà lớn dù người nhận không tham gia chương trình nào.", exampleMessage: "Chúc mừng bạn đã trúng iPhone 15 Pro Max. Vui lòng đóng phí hồ sơ 299.000đ để nhận quà." },
-    { id: "prize-cash-transfer", name: "Nhận tiền thưởng giả", group: "TRÚNG THƯỞNG", description: "Kẻ gian hứa chuyển khoản tiền thưởng nhưng yêu cầu nhập tài khoản, mật khẩu hoặc trả trước một khoản phí.", exampleMessage: "Bạn đã trúng 20.000.000đ từ chương trình tri ân. Xác nhận tài khoản nhận thưởng tại https://quatang-tienmat.com." },
-    { id: "prize-lucky-spin", name: "Vòng quay may mắn giả", group: "TRÚNG THƯỞNG", description: "Tin nhắn mời tham gia vòng quay hoặc khảo sát nhận quà, sau đó yêu cầu thông tin cá nhân hoặc phí nhận quà.", exampleMessage: "Bạn còn 1 lượt quay may mắn miễn phí. Vào https://vongquay-trian.com để nhận phần thưởng." },
-    { id: "delivery-address-fail", name: "Không giao được vì sai địa chỉ", group: "GIẢ ĐƠN VỊ GIAO HÀNG", description: "Đối tượng giả danh đơn vị vận chuyển, báo đơn hàng lỗi địa chỉ để dụ người nhận bấm link cập nhật.", exampleMessage: "Đơn hàng giao không thành công do thiếu số nhà. Cập nhật địa chỉ tại https://giaohang-capnhat.com." },
-    { id: "delivery-extra-fee", name: "Yêu cầu thanh toán phí phát sinh", group: "GIẢ ĐƠN VỊ GIAO HÀNG", description: "Tin nhắn yêu cầu trả thêm phí lưu kho, phí hải quan hoặc phí giao lại với số tiền nhỏ.", exampleMessage: "Kiện hàng đang bị giữ tại kho do thiếu phí xử lý 18.000đ. Thanh toán tại https://ship-fee-vn.com." },
-    { id: "delivery-fake-tracking", name: "Mã vận đơn giả", group: "GIẢ ĐƠN VỊ GIAO HÀNG", description: "Kẻ lừa đảo gửi mã vận đơn hoặc trạng thái giao hàng giả để người nhận mở đường dẫn theo dõi.", exampleMessage: "Mã vận đơn GH938201 vừa cập nhật trạng thái. Xem chi tiết tại https://tracking-ghn-vn.com." },
-    { id: "delivery-customs-tax", name: "Phí hải quan đơn quốc tế giả", group: "GIẢ ĐƠN VỊ GIAO HÀNG", description: "Tin nhắn giả danh giao hàng quốc tế, báo kiện bị giữ hải quan và yêu cầu đóng phí qua đường dẫn lạ.", exampleMessage: "Bưu kiện quốc tế đang bị giữ tại hải quan. Đóng thuế 42.000đ tại https://customs-ship-vn.com để thông quan." }
+    {
+        id: "bank-account-lock",
+        name: "Khóa tài khoản khẩn cấp",
+        group: "GIẢ NGÂN HÀNG",
+        description:
+            "Kẻ lừa đảo giả danh ngân hàng, tạo cảm giác tài khoản đang gặp nguy hiểm để ép người nhận bấm vào liên kết và nhập thông tin đăng nhập hoặc mã OTP.",
+        exampleMessage:
+            "Tài khoản ngân hàng của quý khách đang bị khóa do phát hiện giao dịch bất thường. Vui lòng xác minh ngay tại https://secure-bank-capnhat.com trong 15 phút.",
+    },
+    {
+        id: "bank-otp-verification",
+        name: "Yêu cầu cung cấp OTP",
+        group: "GIẢ NGÂN HÀNG",
+        description:
+            "Tin nhắn yêu cầu người dùng gửi mã OTP, mã xác thực hoặc mật khẩu với lý do hỗ trợ giao dịch.",
+        exampleMessage:
+            "Giao dịch của bạn đang bị treo. Vui lòng gửi lại mã OTP vừa nhận được để nhân viên ngân hàng hoàn tất xác minh.",
+    },
+    {
+        id: "bank-fee-refund",
+        name: "Hoàn phí dịch vụ giả",
+        group: "GIẢ NGÂN HÀNG",
+        description:
+            "Kẻ gian hứa hoàn phí, hoàn tiền hoặc nhận ưu đãi ngân hàng để dụ người nhận truy cập trang giả mạo.",
+        exampleMessage:
+            "Bạn được hoàn 680.000đ phí thường niên. Bấm vào https://refund-bank-vn.com và điền thông tin thẻ để nhận tiền.",
+    },
+    {
+        id: "bank-fake-loan-approval",
+        name: "Duyệt khoản vay giả",
+        group: "GIẢ NGÂN HÀNG",
+        description:
+            "Tin nhắn báo duyệt vay hoặc tăng hạn mức, sau đó yêu cầu đóng phí hồ sơ trước khi giải ngân.",
+        exampleMessage:
+            "Hồ sơ vay 50.000.000đ đã được duyệt. Đóng phí bảo hiểm 450.000đ tại https://vaynhanh-bankvn.com để giải ngân.",
+    },
+    {
+        id: "police-criminal-case",
+        name: "Liên quan vụ án",
+        group: "GIẢ CƠ QUAN CÔNG AN",
+        description:
+            "Đối tượng tự xưng là công an hoặc điều tra viên, nói người nhận liên quan đến vụ án để gây hoảng sợ.",
+        exampleMessage:
+            "Số căn cước của anh/chị có liên quan đến đường dây rửa tiền. Chuyển 30 triệu vào tài khoản tạm giữ để xác minh.",
+    },
+    {
+        id: "police-court-summons",
+        name: "Giấy triệu tập giả",
+        group: "GIẢ CƠ QUAN CÔNG AN",
+        description:
+            "Tin nhắn gửi đường dẫn hoặc tệp giả mạo giấy triệu tập, biên bản phạt hoặc lệnh điều tra.",
+        exampleMessage:
+            "Bạn có giấy triệu tập khẩn cấp. Tải hồ sơ tại https://congan-hoso-khan.com để xem lịch làm việc.",
+    },
+    {
+        id: "police-sim-lock-warning",
+        name: "Đe dọa khóa SIM vì vi phạm",
+        group: "GIẢ CƠ QUAN CÔNG AN",
+        description:
+            "Kẻ lừa đảo nói số điện thoại vi phạm pháp luật hoặc sắp bị khóa để ép người nhận xác minh qua kênh giả.",
+        exampleMessage:
+            "Số thuê bao của bạn bị ghi nhận vi phạm. Bấm vào https://xacminh-congan24h.com để khai báo trong 2 giờ.",
+    },
+    {
+        id: "police-fake-video-call",
+        name: "Gọi video điều tra giả",
+        group: "GIẢ CƠ QUAN CÔNG AN",
+        description:
+            "Đối tượng yêu cầu gọi video, giữ bí mật và quay giấy tờ hoặc ứng dụng ngân hàng để lấy thông tin.",
+        exampleMessage:
+            "Vào cuộc gọi video với điều tra viên ngay. Chuẩn bị CCCD, mở ứng dụng ngân hàng và không tắt máy trong lúc xác minh.",
+    },
+    {
+        id: "prize-phone",
+        name: "Trúng điện thoại giá trị cao",
+        group: "TRÚNG THƯỞNG",
+        description:
+            "Tin nhắn thông báo trúng điện thoại hoặc quà lớn dù người nhận không tham gia chương trình nào.",
+        exampleMessage:
+            "Chúc mừng bạn đã trúng iPhone 15 Pro Max. Vui lòng đóng phí hồ sơ 299.000đ để nhận quà.",
+    },
+    {
+        id: "prize-cash-transfer",
+        name: "Nhận tiền thưởng giả",
+        group: "TRÚNG THƯỞNG",
+        description:
+            "Kẻ gian hứa chuyển khoản tiền thưởng nhưng yêu cầu nhập tài khoản, mật khẩu hoặc trả trước một khoản phí.",
+        exampleMessage:
+            "Bạn đã trúng 20.000.000đ từ chương trình tri ân. Xác nhận tài khoản nhận thưởng tại https://quatang-tienmat.com.",
+    },
+    {
+        id: "prize-lucky-spin",
+        name: "Vòng quay may mắn giả",
+        group: "TRÚNG THƯỞNG",
+        description:
+            "Tin nhắn mời tham gia vòng quay hoặc khảo sát nhận quà, sau đó yêu cầu thông tin cá nhân hoặc phí nhận quà.",
+        exampleMessage:
+            "Bạn còn 1 lượt quay may mắn miễn phí. Vào https://vongquay-trian.com để nhận phần thưởng.",
+    },
+    {
+        id: "delivery-address-fail",
+        name: "Không giao được vì sai địa chỉ",
+        group: "GIẢ ĐƠN VỊ GIAO HÀNG",
+        description:
+            "Đối tượng giả danh đơn vị vận chuyển, báo đơn hàng lỗi địa chỉ để dụ người nhận bấm link cập nhật.",
+        exampleMessage:
+            "Đơn hàng giao không thành công do thiếu số nhà. Cập nhật địa chỉ tại https://giaohang-capnhat.com.",
+    },
+    {
+        id: "delivery-extra-fee",
+        name: "Yêu cầu thanh toán phí phát sinh",
+        group: "GIẢ ĐƠN VỊ GIAO HÀNG",
+        description:
+            "Tin nhắn yêu cầu trả thêm phí lưu kho, phí hải quan hoặc phí giao lại với số tiền nhỏ.",
+        exampleMessage:
+            "Kiện hàng đang bị giữ tại kho do thiếu phí xử lý 18.000đ. Thanh toán tại https://ship-fee-vn.com.",
+    },
+    {
+        id: "delivery-fake-tracking",
+        name: "Mã vận đơn giả",
+        group: "GIẢ ĐƠN VỊ GIAO HÀNG",
+        description:
+            "Kẻ lừa đảo gửi mã vận đơn hoặc trạng thái giao hàng giả để người nhận mở đường dẫn theo dõi.",
+        exampleMessage:
+            "Mã vận đơn GH938201 vừa cập nhật trạng thái. Xem chi tiết tại https://tracking-ghn-vn.com.",
+    },
+    {
+        id: "delivery-customs-tax",
+        name: "Phí hải quan đơn quốc tế giả",
+        group: "GIẢ ĐƠN VỊ GIAO HÀNG",
+        description:
+            "Tin nhắn giả danh giao hàng quốc tế, báo kiện bị giữ hải quan và yêu cầu đóng phí qua đường dẫn lạ.",
+        exampleMessage:
+            "Bưu kiện quốc tế đang bị giữ tại hải quan. Đóng thuế 42.000đ tại https://customs-ship-vn.com để thông quan.",
+    },
 ];
 
 // Du lieu du phong cho che do luyen tap khi file JSON khong tai duoc.
 const FALLBACK_TRAINING_MESSAGES = [
     {
         id: "training-scam-bank-limit",
-        message: "TK cua quy khach bi gioi han giao dich do dang nhap la. Xac minh trong 20 phut tai https://vietcombank-capnhat24h.com neu khong se tam khoa dich vu.",
+        message:
+            "TK cua quy khach bi gioi han giao dich do dang nhap la. Xac minh trong 20 phut tai https://vietcombank-capnhat24h.com neu khong se tam khoa dich vu.",
         label: "scam",
         category: "Gia ngan hang",
-        explanation: "Tin tao ap luc thoi gian, gan danh ngan hang va dua den ten mien la khong phai ten mien chinh thuc cua ngan hang."
+        explanation:
+            "Tin tao ap luc thoi gian, gan danh ngan hang va dua den ten mien la khong phai ten mien chinh thuc cua ngan hang.",
     },
     {
         id: "training-safe-bank-warning",
-        message: "Vietcombank khuyen cao khach hang khong cung cap OTP, mat khau cho bat ky ai. Neu nghi ngo, vui long goi tong dai in tren mat sau the hoac ung dung chinh thuc.",
+        message:
+            "Vietcombank khuyen cao khach hang khong cung cap OTP, mat khau cho bat ky ai. Neu nghi ngo, vui long goi tong dai in tren mat sau the hoac ung dung chinh thuc.",
         label: "safe",
         category: "Canh bao an toan",
-        explanation: "Tin khong yeu cau bam link, khong doi OTP va huong nguoi nhan ve kenh chinh thuc."
+        explanation:
+            "Tin khong yeu cau bam link, khong doi OTP va huong nguoi nhan ve kenh chinh thuc.",
     },
     {
         id: "training-scam-police-app",
-        message: "Toi la dieu tra vien. So CCCD cua anh chi lien quan ho so rua tien. Tai ung dung lam viec tai http://congan-dieutra-hoso.net va nop tien bao lanh de tranh bi bat.",
+        message:
+            "Toi la dieu tra vien. So CCCD cua anh chi lien quan ho so rua tien. Tai ung dung lam viec tai http://congan-dieutra-hoso.net va nop tien bao lanh de tranh bi bat.",
         label: "scam",
         category: "Gia co quan cong an",
-        explanation: "Co quan cong an khong yeu cau tai ung dung qua link la, nop tien bao lanh qua tin nhan hay giu bi mat voi nguoi than."
+        explanation:
+            "Co quan cong an khong yeu cau tai ung dung qua link la, nop tien bao lanh qua tin nhan hay giu bi mat voi nguoi than.",
     },
     {
         id: "training-safe-family",
-        message: "Me nho con toi nay ve som an com. Neu mua duoc thi ghe cho mua them it rau va sua tuoi.",
+        message:
+            "Me nho con toi nay ve som an com. Neu mua duoc thi ghe cho mua them it rau va sua tuoi.",
         label: "safe",
         category: "Tin ca nhan",
-        explanation: "Noi dung doi thuong, khong co lien ket, khong yeu cau tien gap, OTP hay thong tin nhay cam."
+        explanation:
+            "Noi dung doi thuong, khong co lien ket, khong yeu cau tien gap, OTP hay thong tin nhay cam.",
     },
     {
         id: "training-scam-delivery-fee",
-        message: "Don hang GH78320 thieu phi luu kho 18.000d. Thanh toan ngay tai https://ghn-thanhtoan-lephi.vip de duoc giao lai trong hom nay.",
+        message:
+            "Don hang GH78320 thieu phi luu kho 18.000d. Thanh toan ngay tai https://ghn-thanhtoan-lephi.vip de duoc giao lai trong hom nay.",
         label: "scam",
         category: "Gia don vi giao hang",
-        explanation: "Tin yeu cau tra phi nho qua ten mien la co gan ten don vi giao hang, day la cach lua dao rat pho bien."
+        explanation:
+            "Tin yeu cau tra phi nho qua ten mien la co gan ten don vi giao hang, day la cach lua dao rat pho bien.",
     },
     {
         id: "training-safe-delivery",
-        message: "Don hang cua ban du kien giao trong hom nay. Shipper se goi truoc khi den. Ban co the kiem tra ma van don tren ung dung mua hang da dat.",
+        message:
+            "Don hang cua ban du kien giao trong hom nay. Shipper se goi truoc khi den. Ban co the kiem tra ma van don tren ung dung mua hang da dat.",
         label: "safe",
         category: "Thong bao giao hang",
-        explanation: "Tin chi thong bao trang thai giao hang, khong chen link la va khong yeu cau thanh toan hay cung cap thong tin rieng."
+        explanation:
+            "Tin chi thong bao trang thai giao hang, khong chen link la va khong yeu cau thanh toan hay cung cap thong tin rieng.",
     },
     {
         id: "training-scam-prize-fee",
-        message: "Chuc mung ban trung thuong xe may Vision. Vui long nop phi ho so 350.000d tai bit.ly/nhanxe2026 truoc 17h de giu suat nhan qua.",
+        message:
+            "Chuc mung ban trung thuong xe may Vision. Vui long nop phi ho so 350.000d tai bit.ly/nhanxe2026 truoc 17h de giu suat nhan qua.",
         label: "scam",
         category: "Trung thuong",
-        explanation: "Nguoi nhan khong tham gia chuong trinh nhung bi yeu cau nop phi truoc qua link rut gon, day la dau hieu lua dao."
+        explanation:
+            "Nguoi nhan khong tham gia chuong trinh nhung bi yeu cau nop phi truoc qua link rut gon, day la dau hieu lua dao.",
     },
     {
         id: "training-safe-school",
-        message: "Lop 12A1 hop phu huynh luc 19h30 thu Sau tai phong 203. Noi dung gom lich on thi va ke hoach tong ket hoc ky.",
+        message:
+            "Lop 12A1 hop phu huynh luc 19h30 thu Sau tai phong 203. Noi dung gom lich on thi va ke hoach tong ket hoc ky.",
         label: "safe",
         category: "Thong bao lop hoc",
-        explanation: "Thong bao co thoi gian va dia diem ro rang, khong yeu cau chuyen tien gap hay truy cap duong dan bat thuong."
+        explanation:
+            "Thong bao co thoi gian va dia diem ro rang, khong yeu cau chuyen tien gap hay truy cap duong dan bat thuong.",
     },
     {
         id: "training-scam-job-task",
-        message: "Nhan viec online luong 500k/ngay. Chuyen truoc 200k kich hoat tai khoan, sau 5 phut he thong hoan lai ca goc lan hoa hong.",
+        message:
+            "Nhan viec online luong 500k/ngay. Chuyen truoc 200k kich hoat tai khoan, sau 5 phut he thong hoan lai ca goc lan hoa hong.",
         label: "scam",
         category: "Viec lam gia",
-        explanation: "Loi hua thu nhap cao bat thuong va yeu cau chuyen tien truoc la dau hieu cua lua dao viec lam, nhiem vu ao."
+        explanation:
+            "Loi hua thu nhap cao bat thuong va yeu cau chuyen tien truoc la dau hieu cua lua dao viec lam, nhiem vu ao.",
     },
     {
         id: "training-safe-electricity",
-        message: "Hoa don tien dien thang nay da phat hanh. Gia dinh co the thanh toan qua ung dung ngan hang dang su dung hoac diem thu gan nha.",
+        message:
+            "Hoa don tien dien thang nay da phat hanh. Gia dinh co the thanh toan qua ung dung ngan hang dang su dung hoac diem thu gan nha.",
         label: "safe",
         category: "Thong bao dich vu",
-        explanation: "Tin chi nhac thanh toan qua cac kenh quen thuoc, khong gui link la hay doi thong tin dang nhap."
+        explanation:
+            "Tin chi nhac thanh toan qua cac kenh quen thuoc, khong gui link la hay doi thong tin dang nhap.",
     },
     {
         id: "training-scam-investment-profit",
-        message: "Dau tu goi AI loi nhuan 30% moi tuan. Nap toi thieu 1.000.000d vao vi rieng, cam ket hoan von trong 7 ngay neu khong co loi.",
+        message:
+            "Dau tu goi AI loi nhuan 30% moi tuan. Nap toi thieu 1.000.000d vao vi rieng, cam ket hoan von trong 7 ngay neu khong co loi.",
         label: "scam",
         category: "Dau tu loi nhuan cao",
-        explanation: "Cam ket loi nhuan cao, hoan von va yeu cau nap tien vao vi rieng la dau hieu lua dao dau tu."
+        explanation:
+            "Cam ket loi nhuan cao, hoan von va yeu cau nap tien vao vi rieng la dau hieu lua dao dau tu.",
     },
     {
         id: "training-safe-clinic",
-        message: "Phong kham thong bao lich tai kham cua bac si Minh vao 8h30 ngay 20/06. Neu can doi lich, vui long goi so tong dai da in tren phieu hen.",
+        message:
+            "Phong kham thong bao lich tai kham cua bac si Minh vao 8h30 ngay 20/06. Neu can doi lich, vui long goi so tong dai da in tren phieu hen.",
         label: "safe",
         category: "Thong bao y te",
-        explanation: "Tin co noi dung hen lich ro rang, khong yeu cau bam link la, chuyen tien gap hay cung cap ma xac thuc."
+        explanation:
+            "Tin co noi dung hen lich ro rang, khong yeu cau bam link la, chuyen tien gap hay cung cap ma xac thuc.",
     },
     {
         id: "training-scam-social-account",
-        message: "Tai khoan Facebook cua ban bi to cao vi pham ban quyen. Xac minh chu so huu tai https://meta-baomat-page.com trong 12 gio neu khong page se bi khoa.",
+        message:
+            "Tai khoan Facebook cua ban bi to cao vi pham ban quyen. Xac minh chu so huu tai https://meta-baomat-page.com trong 12 gio neu khong page se bi khoa.",
         label: "scam",
         category: "Chiem tai khoan mang xa hoi",
-        explanation: "Tin gia danh nen tang mang xa hoi, tao ap luc khoa tai khoan va dua den ten mien khong chinh thuc de lay mat khau."
+        explanation:
+            "Tin gia danh nen tang mang xa hoi, tao ap luc khoa tai khoan va dua den ten mien khong chinh thuc de lay mat khau.",
     },
     {
         id: "training-safe-store-promo",
-        message: "Cua hang da gui ma giam gia 10% cho don hang tiep theo. Ma co the nhap truc tiep trong ung dung mua hang, khong can cung cap thong tin ca nhan.",
+        message:
+            "Cua hang da gui ma giam gia 10% cho don hang tiep theo. Ma co the nhap truc tiep trong ung dung mua hang, khong can cung cap thong tin ca nhan.",
         label: "safe",
         category: "Khuyen mai an toan",
-        explanation: "Tin khuyen mai khong bat bam link, khong doi phi truoc va khong yeu cau thong tin dang nhap hay OTP."
+        explanation:
+            "Tin khuyen mai khong bat bam link, khong doi phi truoc va khong yeu cau thong tin dang nhap hay OTP.",
     },
     {
         id: "training-scam-tax-refund",
-        message: "Ho so hoan thue ca nhan cua ban duoc duyet 2.400.000d. Cap nhat so tai khoan nhan tien tai https://thue-hoantien-gov.com truoc 16h hom nay.",
+        message:
+            "Ho so hoan thue ca nhan cua ban duoc duyet 2.400.000d. Cap nhat so tai khoan nhan tien tai https://thue-hoantien-gov.com truoc 16h hom nay.",
         label: "scam",
         category: "Gia co quan nha nuoc",
-        explanation: "Tin dung chu de hoan thue de du nguoi nhan vao ten mien gia mao co chu gov, nhung khong phai cong dich vu cong chinh thuc."
-    }
+        explanation:
+            "Tin dung chu de hoan thue de du nguoi nhan vao ten mien gia mao co chu gov, nhung khong phai cong dich vu cong chinh thuc.",
+    },
 ];
 
 const input = document.getElementById("messageInput");
@@ -287,14 +461,13 @@ const highlightedMessage = document.getElementById("highlightedMessage");
 const signList = document.getElementById("signList");
 const actionList = document.getElementById("actionList");
 const rawResponse = document.getElementById("rawResponse");
+const psychologyAdvice = document.getElementById("psychologyAdvice");
 const friendlyMessage = document.getElementById("friendlyMessage");
 const historyList = document.getElementById("historyList");
 const checkView = document.getElementById("checkView");
-const linkView = document.getElementById("linkView");
 const libraryView = document.getElementById("libraryView");
 const viewTabs = document.querySelector(".view-tabs");
 const checkTab = document.getElementById("checkTab");
-const linkTab = document.getElementById("linkTab");
 const libraryTab = document.getElementById("libraryTab");
 const trainingTab = document.getElementById("trainingTab");
 const backToCheckBtn = document.getElementById("backToCheckBtn");
@@ -311,24 +484,27 @@ const trainingCard = document.getElementById("trainingCard");
 const trainingProgress = document.getElementById("trainingProgress");
 const trainingScore = document.getElementById("trainingScore");
 const trainingMessage = document.getElementById("trainingMessage");
-const trainingAnswerButtons = document.querySelector(".training-answer-buttons");
+const trainingAnswerButtons = document.querySelector(
+    ".training-answer-buttons",
+);
 const guessScamBtn = document.getElementById("guessScamBtn");
 const guessSafeBtn = document.getElementById("guessSafeBtn");
 const trainingFeedback = document.getElementById("trainingFeedback");
 const nextTrainingBtn = document.getElementById("nextTrainingBtn");
 const trainingSummary = document.getElementById("trainingSummary");
 const trainingSummaryScore = document.getElementById("trainingSummaryScore");
-const trainingSummaryComment = document.getElementById("trainingSummaryComment");
+const trainingSummaryComment = document.getElementById(
+    "trainingSummaryComment",
+);
 const restartTrainingBtn = document.getElementById("restartTrainingBtn");
 const linkScanPanel = document.getElementById("linkScanPanel");
-const linkInput = document.getElementById("linkInput");
-const linkCharCount = document.getElementById("linkCharCount");
-const linkClearBtn = document.getElementById("linkClearBtn");
 const linkScanStatus = document.getElementById("linkScanStatus");
 const linkScanList = document.getElementById("linkScanList");
 const warningCardPanel = document.getElementById("warningCardPanel");
 const warningCardCanvas = document.getElementById("warningCardCanvas");
-const downloadWarningCardBtn = document.getElementById("downloadWarningCardBtn");
+const downloadWarningCardBtn = document.getElementById(
+    "downloadWarningCardBtn",
+);
 const warningCardStatus = document.getElementById("warningCardStatus");
 const tutorialModal = document.getElementById("tutorialModal");
 const tutorialOpenBtn = document.getElementById("tutorialOpenBtn");
@@ -348,13 +524,7 @@ let trainingItems = [];
 let trainingIndex = 0;
 let trainingPoints = 0;
 let trainingAnswered = false;
-const VIEW_NAMES = ["check", "link", "library", "training"];
-const VIEW_ORDER = { check: 0, link: 1, library: 2, training: 3 };
-const VIEW_EXIT_DELAY = 170;
-const VIEW_ENTER_DURATION = 430;
-let activeViewName = "check";
-let viewSwitchTimer = null;
-let viewEnterTimer = null;
+let latestAnalysis = null;
 
 // Gemini is called only through the local backend so the API key never appears in the browser.
 async function analyzeMessage(message)
@@ -368,7 +538,7 @@ async function analyzeMessage(message)
             method: "POST",
             headers: { "Content-Type": "application/json" },
             signal: controller.signal,
-            body: JSON.stringify({ message })
+            body: JSON.stringify({ message }),
         });
 
         const data = await response.json().catch(() => ({}));
@@ -388,7 +558,10 @@ async function analyzeMessage(message)
             throw new Error("empty_response");
         }
 
-        return rawText;
+        return {
+            rawText,
+            detectiveResult: data.detectiveResult,
+        };
     } catch (error)
     {
         if (error?.name === "AbortError")
@@ -402,18 +575,35 @@ async function analyzeMessage(message)
     }
 }
 
-function parseDetectiveResult(rawText)
+async function analyzeWithPsychology(message)
 {
-    try
+    const detectiveResponse = await analyzeMessage(message);
+    const detectiveResult = normalizeStructuredResult(
+        detectiveResponse.detectiveResult,
+    );
+
+    let psychologyAdvice = null;
+    if (
+        detectiveResult.risk === "Nghi ngờ" ||
+        detectiveResult.risk === "Nguy hiểm"
+    )
     {
-        const text = typeof rawText === "string" ? stripCodeFence(rawText) : rawText;
-        const data = typeof text === "string" ? JSON.parse(text) : text;
-        return normalizeStructuredResult(data);
-    } catch
-    {
-        const lineResult = parseLineResult(rawText);
-        return lineResult || { ...DEFAULT_RESULT };
+        try
+        {
+            const { getPsychologyAdvice } = await import("./js/psychologist.js");
+            psychologyAdvice = await getPsychologyAdvice(message, detectiveResult);
+        } catch (error)
+        {
+            console.warn("Psychology advice error", error);
+            psychologyAdvice = "Cô tâm lý đang bận, vui lòng thử lại sau.";
+        }
     }
+
+    return {
+        rawText: detectiveResponse.rawText,
+        detectiveResult,
+        psychologyAdvice,
+    };
 }
 
 // Chuan hoa JSON cua AI ve mot format duy nhat de renderResult chi can doc mot kieu du lieu.
@@ -424,53 +614,24 @@ function normalizeStructuredResult(data)
         ? data.signs
             .map((sign) => ({
                 quote: String(sign?.quote || "").trim(),
-                reason: String(sign?.reason || "").trim()
+                reason: String(sign?.reason || "").trim(),
             }))
             .filter((sign) => sign.quote || sign.reason)
         : [];
 
     const actions = Array.isArray(data?.actions)
-        ? data.actions.map((action) => String(action || "").trim()).filter(Boolean).slice(0, 3)
+        ? data.actions
+            .map((action) => String(action || "").trim())
+            .filter(Boolean)
+            .slice(0, 3)
         : [];
 
     return {
         risk,
         signs,
         actions: fillActions(actions),
-        usedFallback: false
+        usedFallback: false,
     };
-}
-
-function parseLineResult(rawText)
-{
-    try
-    {
-        const text = typeof rawText === "string" ? stripCodeFence(rawText) : String(rawText || "");
-        const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-        if (lines.length === 0) return null;
-
-        const risk = normalizeRisk(lines[0]);
-        const reason = lines[1] || "";
-        const actions = (lines[2] || "")
-            .split(/\s*[,;]\s*/)
-            .map((item) => item.trim())
-            .filter(Boolean);
-
-        return {
-            risk,
-            signs: reason ? [{ quote: "", reason }] : [],
-            actions: fillActions(actions),
-            usedFallback: false
-        };
-    } catch
-    {
-        return null;
-    }
-}
-
-function stripCodeFence(text)
-{
-    return String(text || "").replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
 }
 
 function normalizeRisk(risk)
@@ -576,8 +737,7 @@ function updateLinkScan()
 {
     if (!linkScanPanel || !linkScanList || !linkScanStatus) return;
 
-    const sourceText = linkInput ? linkInput.value : input.value;
-    const links = extractLinksFromText(sourceText);
+    const links = extractLinksFromText(input.value);
     linkScanList.innerHTML = "";
 
     if (links.length === 0)
@@ -587,8 +747,12 @@ function updateLinkScan()
         return;
     }
 
-    const dangerousCount = links.filter((link) => link.severity === "danger").length;
-    const warningCount = links.filter((link) => link.severity === "warning").length;
+    const dangerousCount = links.filter(
+        (link) => link.severity === "danger",
+    ).length;
+    const warningCount = links.filter(
+        (link) => link.severity === "warning",
+    ).length;
 
     if (dangerousCount > 0)
     {
@@ -609,14 +773,19 @@ function updateLinkScan()
         const item = document.createElement("article");
         item.className = `link-scan-item ${link.severity}`;
 
-        const reasons = link.warnings.length > 0
-            ? link.warnings
-            : [{
-                title: link.officialOrg ? "Tên miền chính thống" : "Chưa xác định tổ chức",
-                detail: link.officialOrg
-                    ? `Tên miền này khớp với ${link.officialOrg.name}.`
-                    : "ScamCheck chưa thấy tên miền này giả mạo tổ chức trong danh sách, nhưng bạn vẫn nên kiểm tra nguồn gửi."
-            }];
+        const reasons =
+            link.warnings.length > 0
+                ? link.warnings
+                : [
+                    {
+                        title: link.officialOrg
+                            ? "Tên miền chính thống"
+                            : "Chưa xác định tổ chức",
+                        detail: link.officialOrg
+                            ? `Tên miền này khớp với ${link.officialOrg.name}.`
+                            : "ScamCheck chưa thấy tên miền này giả mạo tổ chức trong danh sách, nhưng bạn vẫn nên kiểm tra nguồn gửi.",
+                    },
+                ];
 
         item.innerHTML = `
             <div class="link-scan-head">
@@ -630,23 +799,6 @@ function updateLinkScan()
         `;
         linkScanList.appendChild(item);
     });
-}
-
-function updateLinkCounter()
-{
-    if (!linkInput || !linkCharCount) return;
-    linkCharCount.textContent = `${linkInput.value.length}/${MAX_LENGTH} ký tự`;
-}
-
-function prepareLinkScanner()
-{
-    if (linkInput && !linkInput.value.trim() && input?.value.trim())
-    {
-        linkInput.value = input.value;
-    }
-
-    updateLinkCounter();
-    updateLinkScan();
 }
 
 function extractLinksFromText(text)
@@ -685,7 +837,9 @@ function cleanRawLink(raw)
 
 function parseLink(raw)
 {
-    const candidate = /^[a-z][a-z\d+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`;
+    const candidate = /^[a-z][a-z\d+.-]*:\/\//i.test(raw)
+        ? raw
+        : `https://${raw}`;
     try
     {
         const url = new URL(candidate);
@@ -695,7 +849,7 @@ function parseLink(raw)
             raw,
             href: url.href,
             host,
-            rootDomain: getRootDomain(host)
+            rootDomain: getRootDomain(host),
         };
     } catch
     {
@@ -706,14 +860,18 @@ function parseLink(raw)
 function analyzeLink(link)
 {
     const warnings = [];
-    const officialOrg = OFFICIAL_ORGANIZATIONS.find((org) => isOfficialHost(link.host, org));
-    const shortener = SHORTENER_DOMAINS.has(link.rootDomain) || SHORTENER_DOMAINS.has(link.host);
+    const officialOrg = OFFICIAL_ORGANIZATIONS.find((org) =>
+        isOfficialHost(link.host, org),
+    );
+    const shortener =
+        SHORTENER_DOMAINS.has(link.rootDomain) || SHORTENER_DOMAINS.has(link.host);
 
     if (shortener)
     {
         warnings.push({
             title: "Link rút gọn",
-            detail: "Đường dẫn bị che tên miền thật. Chỉ mở sau khi kiểm tra nguồn gửi hoặc dùng công cụ mở rộng link."
+            detail:
+                "Đường dẫn bị che tên miền thật. Chỉ mở sau khi kiểm tra nguồn gửi hoặc dùng công cụ mở rộng link.",
         });
     }
 
@@ -723,18 +881,26 @@ function analyzeLink(link)
         warnings.push(...spoofWarnings);
     }
 
-    const hasDanger = warnings.some((warning) =>
-        warning.title.includes("giả mạo")
-        || warning.title.includes("gần giống")
-        || warning.title.includes("thay thế"));
-    const severity = hasDanger ? "danger" : warnings.length > 0 ? "warning" : officialOrg ? "safe" : "neutral";
+    const hasDanger = warnings.some(
+        (warning) =>
+            warning.title.includes("giả mạo") ||
+            warning.title.includes("gần giống") ||
+            warning.title.includes("thay thế"),
+    );
+    const severity = hasDanger
+        ? "danger"
+        : warnings.length > 0
+            ? "warning"
+            : officialOrg
+                ? "safe"
+                : "neutral";
 
     return {
         ...link,
         officialOrg,
         warnings,
         severity,
-        label: getLinkLabel(severity, officialOrg)
+        label: getLinkLabel(severity, officialOrg),
     };
 }
 
@@ -751,7 +917,9 @@ function detectSpoofedDomain(host)
     const warnings = [];
     const compactHost = compactDomainText(host);
     const normalizedHost = normalizeLookalikeText(host);
-    const suspiciousWord = SUSPICIOUS_DOMAIN_WORDS.find((word) => normalizedHost.includes(word));
+    const suspiciousWord = SUSPICIOUS_DOMAIN_WORDS.find((word) =>
+        normalizedHost.includes(word),
+    );
 
     OFFICIAL_ORGANIZATIONS.forEach((org) =>
     {
@@ -765,7 +933,7 @@ function detectSpoofedDomain(host)
             {
                 warnings.push({
                     title: "Tên miền giả mạo tổ chức",
-                    detail: `${host} có nhắc tới ${org.name} nhưng không thuộc tên miền chính thức của tổ chức này.`
+                    detail: `${host} có nhắc tới ${org.name} nhưng không thuộc tên miền chính thức của tổ chức này.`,
                 });
                 return;
             }
@@ -774,7 +942,7 @@ function detectSpoofedDomain(host)
             {
                 warnings.push({
                     title: "Tên miền dùng ký tự thay thế",
-                    detail: `${host} trông gần giống ${org.name}, có thể dùng ký tự thay thế như rn/m, 0/o hoặc thêm bớt chữ.`
+                    detail: `${host} trông gần giống ${org.name}, có thể dùng ký tự thay thế như rn/m, 0/o hoặc thêm bớt chữ.`,
                 });
                 return;
             }
@@ -784,7 +952,7 @@ function detectSpoofedDomain(host)
             {
                 warnings.push({
                     title: "Tên miền gần giống chính thống",
-                    detail: `${lookalike} gần giống ${alias} của ${org.name}; hãy kiểm tra thật kỹ trước khi mở.`
+                    detail: `${lookalike} gần giống ${alias} của ${org.name}; hãy kiểm tra thật kỹ trước khi mở.`,
                 });
             }
         });
@@ -794,7 +962,7 @@ function detectSpoofedDomain(host)
     {
         warnings.push({
             title: "Từ khóa gây áp lực",
-            detail: `Tên miền có từ "${suspiciousWord}", thường xuất hiện trong trang giả mạo yêu cầu xác minh, cập nhật hoặc thanh toán gấp.`
+            detail: `Tên miền có từ "${suspiciousWord}", thường xuất hiện trong trang giả mạo yêu cầu xác minh, cập nhật hoặc thanh toán gấp.`,
         });
     }
 
@@ -840,12 +1008,17 @@ function dedupeWarnings(warnings)
 
 function isOfficialHost(host, org)
 {
-    return org.domains.some((domain) => host === domain || host.endsWith(`.${domain}`));
+    return org.domains.some(
+        (domain) => host === domain || host.endsWith(`.${domain}`),
+    );
 }
 
 function getRootDomain(host)
 {
-    const parts = String(host || "").toLowerCase().split(".").filter(Boolean);
+    const parts = String(host || "")
+        .toLowerCase()
+        .split(".")
+        .filter(Boolean);
     if (parts.length <= 2) return parts.join(".");
 
     const twoPartSuffix = parts.slice(-2).join(".");
@@ -893,7 +1066,7 @@ function levenshteinDistance(a, b)
             matrix[i][j] = Math.min(
                 matrix[i - 1][j] + 1,
                 matrix[i][j - 1] + 1,
-                matrix[i - 1][j - 1] + cost
+                matrix[i - 1][j - 1] + cost,
             );
         }
     }
@@ -901,12 +1074,14 @@ function levenshteinDistance(a, b)
     return matrix[left.length][right.length];
 }
 
-function renderResult(message, result, rawText)
+function renderResult(message, result, rawText, advice = null)
 {
     resultArea.classList.remove("hidden");
     riskBadge.textContent = result.risk;
     riskBadge.className = `risk-badge ${riskClass(result.risk)}`;
     highlightedMessage.innerHTML = highlightQuotes(message, result.signs);
+    psychologyAdvice.textContent =
+        advice || "Chưa có phần giải thích tâm lý cho kết quả này.";
 
     signList.innerHTML = "";
     if (result.signs.length === 0)
@@ -933,14 +1108,16 @@ function renderResult(message, result, rawText)
         actionList.appendChild(item);
     });
 
-    rawResponse.textContent = typeof rawText === "string" ? rawText : JSON.stringify(rawText, null, 2);
+    rawResponse.textContent =
+        typeof rawText === "string" ? rawText : JSON.stringify(rawText, null, 2);
     renderWarningCard(message, result);
 
-    btnResponds.forEach(btn => {
+    btnResponds.forEach((btn) =>
+    {
         btn.disabled = false;
         btn.classList.remove("active");
     });
-    
+
     // Ẩn khung chứa lời khuyên cũ đi
     if (responderGuidance)
     {
@@ -949,14 +1126,25 @@ function renderResult(message, result, rawText)
     }
 
     // Thực hiện kiểm tra rủi ro: Chỉ hiển thị khi kết quả không phải là "An toàn"
-    if (responderQuestionArea && result && result.risk !== "An toàn") {
+    if (responderQuestionArea && result && result.risk !== "An toàn")
+    {
         responderQuestionArea.classList.remove("hidden"); // Hiện khung câu hỏi
-    } else if (responderQuestionArea) {
-        responderQuestionArea.classList.add("hidden");    // Ẩn khung câu hỏi
+    } else if (responderQuestionArea)
+    {
+        responderQuestionArea.classList.add("hidden"); // Ẩn khung câu hỏi
     }
 }
 
-function wrapTextDynamic(ctx, text, x, y, maxWidth, lineHeight, maxLines, draw = true)
+function wrapTextDynamic(
+    ctx,
+    text,
+    x,
+    y,
+    maxWidth,
+    lineHeight,
+    maxLines,
+    draw = true,
+)
 {
     const words = String(text || "").split(/\s+/);
     let line = "";
@@ -1035,17 +1223,20 @@ async function renderWarningCard(message, result)
 
             // Font hệ thống cao cấp hiển thị tiếng Việt mượt mà, không bị lỗi dấu thanh
             ctx.fillStyle = palette.text;
-            ctx.font = "900 54px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.font =
+                "900 54px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
             ctx.fillText("ScamCheck", 170, 225);
 
-            ctx.font = "800 34px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.font =
+                "800 34px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
             ctx.fillText("THẺ CẢNH BÁO TIN NHẮN", 170, 285);
 
             ctx.fillStyle = "#ffffff";
             roundRect(ctx, width - 380, 185, 220, 90, 24);
             ctx.fill();
             ctx.fillStyle = palette.text;
-            ctx.font = "900 34px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.font =
+                "900 34px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
             ctx.textAlign = "center";
             ctx.fillText(result.risk || "Nghi ngờ", width - 270, 243);
             ctx.textAlign = "left";
@@ -1056,10 +1247,12 @@ async function renderWarningCard(message, result)
         if (!dryRun)
         {
             ctx.fillStyle = "#17202a";
-            ctx.font = "900 42px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.font =
+                "900 42px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
             ctx.fillText("Mức rủi ro", 130, y);
             ctx.fillStyle = palette.text;
-            ctx.font = "900 72px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.font =
+                "900 72px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
             ctx.fillText(result.risk || "Nghi ngờ", 130, y + 80);
         }
 
@@ -1068,14 +1261,25 @@ async function renderWarningCard(message, result)
         if (!dryRun)
         {
             ctx.fillStyle = "#17202a";
-            ctx.font = "900 42px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.font =
+                "900 42px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
             ctx.fillText("Dấu hiệu chính", 130, y);
         }
 
         ctx.fillStyle = "#2f3b47";
-        ctx.font = "34px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-        const signHeight = wrapTextDynamic(ctx, mainSign, 130, y + 60, width - 260, 48, 10, !dryRun);
-        
+        ctx.font =
+            "34px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        const signHeight = wrapTextDynamic(
+            ctx,
+            mainSign,
+            130,
+            y + 60,
+            width - 260,
+            48,
+            10,
+            !dryRun,
+        );
+
         y += 60 + signHeight + 65;
 
         const bottomStartY = y;
@@ -1083,18 +1287,29 @@ async function renderWarningCard(message, result)
         if (!dryRun)
         {
             ctx.fillStyle = "#17202a";
-            ctx.font = "900 36px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.font =
+                "900 36px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
             ctx.fillText("Tin được kiểm tra", 130, bottomStartY);
         }
 
         ctx.fillStyle = "#4b5563";
-        ctx.font = "28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-        const msgHeight = wrapTextDynamic(ctx, shortenForCard(message, 150), 130, bottomStartY + 50, 560, 38, 5, !dryRun);
+        ctx.font =
+            "28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        const msgHeight = wrapTextDynamic(
+            ctx,
+            shortenForCard(message, 150),
+            130,
+            bottomStartY + 50,
+            560,
+            38,
+            5,
+            !dryRun,
+        );
 
         if (!dryRun)
         {
             ctx.fillStyle = "#f1f5f9";
-            roundRect(ctx, 730, bottomStartY - 30, 250, 330, 18);
+            roundRect(ctx, 740, bottomStartY - 30, 230, 230, 18);
             ctx.fill();
 
             if (qrCanvas)
@@ -1103,32 +1318,60 @@ async function renderWarningCard(message, result)
             } else
             {
                 ctx.fillStyle = "#17202a";
-                ctx.font = "900 28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-                wrapTextDynamic(ctx, "QR chưa sẵn sàng", 765, bottomStartY + 60, 180, 34, 2, true);
+                ctx.font =
+                    "900 28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+                wrapTextDynamic(
+                    ctx,
+                    "QR chưa sẵn sàng",
+                    765,
+                    bottomStartY + 60,
+                    180,
+                    34,
+                    2,
+                    true,
+                );
             }
 
             ctx.fillStyle = "#475569";
-            ctx.font = "24px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.font =
+                "24px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
             ctx.textAlign = "center";
-            wrapTextDynamic(ctx, "Quét mã để mở ScamCheck", 855, bottomStartY + 225, 230, 32, 2, true);
-            ctx.fillStyle = "#64748b";
-            ctx.font = "19px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-            wrapTextDynamic(ctx, PRODUCT_URL.replace("https://", ""), 855, bottomStartY + 270, 220, 26, 2, true);
+            wrapTextDynamic(
+                ctx,
+                "Quét mã để mở ScamCheck",
+                855,
+                bottomStartY + 235,
+                260,
+                32,
+                2,
+                true,
+            );
             ctx.textAlign = "left";
         }
 
-        const blockHeight = Math.max(50 + msgHeight, 360);
+        const blockHeight = Math.max(50 + msgHeight, 280);
         y += blockHeight + 70;
 
         if (!dryRun)
         {
             ctx.fillStyle = "#17202a";
-            ctx.font = "28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.font =
+                "28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
         }
 
-        const footerText = "Không bấm link lạ, không cung cấp OTP, không chuyển tiền khi chưa xác minh qua kênh chính thức.";
-        const footerHeight = wrapTextDynamic(ctx, footerText, 130, y, width - 260, 38, 3, !dryRun);
-        
+        const footerText =
+            "Không bấm link lạ, không cung cấp OTP, không chuyển tiền khi chưa xác minh qua kênh chính thức.";
+        const footerHeight = wrapTextDynamic(
+            ctx,
+            footerText,
+            130,
+            y,
+            width - 260,
+            38,
+            3,
+            !dryRun,
+        );
+
         y += footerHeight + 120;
         return y;
     }
@@ -1142,10 +1385,12 @@ async function renderWarningCard(message, result)
 
     if (qrCanvas)
     {
-        warningCardStatus.textContent = "Ảnh đã sẵn sàng. Mã quét dẫn về ScamCheck.";
+        warningCardStatus.textContent =
+            "Ảnh đã sẵn sàng. Mã quét dẫn về ScamCheck.";
     } else
     {
-        warningCardStatus.textContent = "Ảnh đã sẵn sàng. QR cần kết nối mạng để tải thư viện tạo mã.";
+        warningCardStatus.textContent =
+            "Ảnh đã sẵn sàng. QR cần kết nối mạng để tải thư viện tạo mã.";
     }
 
     latestWarningCardName = `scamcheck-${Date.now()}.png`;
@@ -1162,12 +1407,20 @@ function getWarningCardPalette(risk)
 function getMainSignText(result)
 {
     const sign = result.signs?.[0];
-    return sign?.reason || sign?.quote || "Chưa phát hiện dấu hiệu cụ thể, nhưng vẫn nên kiểm tra nguồn gửi trước khi làm theo.";
+    return (
+        sign?.reason ||
+        sign?.quote ||
+        "Chưa phát hiện dấu hiệu cụ thể, nhưng vẫn nên kiểm tra nguồn gửi trước khi làm theo."
+    );
 }
 
 function getProductUrl()
 {
-    return PRODUCT_URL;
+    if (window.location.protocol === "file:")
+    {
+        return "https://github.com/jakenvni/Scamcheck";
+    }
+    return `${window.location.origin}${window.location.pathname}`;
 }
 
 async function createQrCanvas(text)
@@ -1183,8 +1436,8 @@ async function createQrCanvas(text)
             errorCorrectionLevel: "M",
             color: {
                 dark: "#17202a",
-                light: "#ffffff"
-            }
+                light: "#ffffff",
+            },
         });
         return canvas;
     } catch
@@ -1265,8 +1518,12 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines)
 
 function shortenForCard(text, maxLength)
 {
-    const value = String(text || "").replace(/\s+/g, " ").trim();
-    return value.length > maxLength ? `${value.slice(0, maxLength - 3)}...` : value;
+    const value = String(text || "")
+        .replace(/\s+/g, " ")
+        .trim();
+    return value.length > maxLength
+        ? `${value.slice(0, maxLength - 3)}...`
+        : value;
 }
 
 function renderHistory(history, onOpenItem)
@@ -1295,132 +1552,49 @@ function renderHistory(history, onOpenItem)
     });
 }
 
-function getViewElement(viewName)
+function setView(viewName)
 {
-    if (viewName === "link") return linkView;
-    if (viewName === "library") return libraryView;
-    if (viewName === "training") return trainingView;
-    return checkView;
-}
-
-function getVisibleViewName()
-{
-    return VIEW_NAMES.find((name) =>
-    {
-        const view = getViewElement(name);
-        return view && !view.classList.contains("hidden");
-    }) || activeViewName;
-}
-
-function clearViewAnimationClasses(view)
-{
-    view?.classList.remove("view-enter-right", "view-enter-left", "view-exit-left", "view-exit-right");
-}
-
-function showOnlyView(viewName)
-{
-    VIEW_NAMES.forEach((name) =>
-    {
-        const view = getViewElement(name);
-        if (!view) return;
-        clearViewAnimationClasses(view);
-        view.classList.toggle("hidden", name !== viewName);
-    });
-}
-
-function updateViewTabs(viewName)
-{
-    const isLink = viewName === "link";
     const isLibrary = viewName === "library";
     const isTraining = viewName === "training";
-    if (viewTabs) viewTabs.dataset.active = isLink ? "link" : isLibrary ? "library" : isTraining ? "training" : "check";
-    checkTab?.classList.toggle("active", !isLink && !isLibrary && !isTraining);
-    linkTab?.classList.toggle("active", isLink);
+    if (viewTabs)
+        viewTabs.dataset.active = isLibrary
+            ? "library"
+            : isTraining
+                ? "training"
+                : "check";
+    checkView?.classList.toggle("hidden", isLibrary || isTraining);
+    libraryView?.classList.toggle("hidden", !isLibrary);
+    trainingView?.classList.toggle("hidden", !isTraining);
+    checkTab?.classList.toggle("active", !isLibrary && !isTraining);
     libraryTab?.classList.toggle("active", isLibrary);
     trainingTab?.classList.toggle("active", isTraining);
-    checkTab?.setAttribute("aria-current", (!isLink && !isLibrary && !isTraining) ? "page" : "false");
-    linkTab?.setAttribute("aria-current", isLink ? "page" : "false");
+    checkTab?.setAttribute(
+        "aria-current",
+        !isLibrary && !isTraining ? "page" : "false",
+    );
     libraryTab?.setAttribute("aria-current", isLibrary ? "page" : "false");
     trainingTab?.setAttribute("aria-current", isTraining ? "page" : "false");
-}
 
-function prepareViewData(viewName)
-{
-    if (viewName === "link")
-    {
-        prepareLinkScanner();
-    }
-
-    if (viewName === "library")
+    if (isLibrary)
     {
         loadScamLibrary();
     }
 
-    if (viewName === "training")
+    if (isTraining)
     {
         loadTrainingMessages();
     }
 }
 
-function setView(viewName)
-{
-    const nextViewName = VIEW_NAMES.includes(viewName) ? viewName : "check";
-    const previousViewName = getVisibleViewName();
-    const previousView = getViewElement(previousViewName);
-    const nextView = getViewElement(nextViewName);
-    const isSameView = previousViewName === nextViewName;
-
-    window.clearTimeout(viewSwitchTimer);
-    window.clearTimeout(viewEnterTimer);
-    VIEW_NAMES.forEach((name) => clearViewAnimationClasses(getViewElement(name)));
-
-    updateViewTabs(nextViewName);
-    prepareViewData(nextViewName);
-
-    if (!nextView)
-    {
-        return;
-    }
-
-    if (isSameView || !previousView || previousView.classList.contains("hidden"))
-    {
-        showOnlyView(nextViewName);
-        activeViewName = nextViewName;
-        return;
-    }
-
-    const movingForward = VIEW_ORDER[nextViewName] > VIEW_ORDER[previousViewName];
-    previousView.classList.add(movingForward ? "view-exit-left" : "view-exit-right");
-    activeViewName = nextViewName;
-
-    viewSwitchTimer = window.setTimeout(() =>
-    {
-        previousView.classList.add("hidden");
-        clearViewAnimationClasses(previousView);
-
-        VIEW_NAMES.forEach((name) =>
-        {
-            const view = getViewElement(name);
-            if (view && name !== nextViewName)
-            {
-                view.classList.add("hidden");
-            }
-        });
-
-        nextView.classList.remove("hidden");
-        nextView.classList.add(movingForward ? "view-enter-right" : "view-enter-left");
-
-        viewEnterTimer = window.setTimeout(() =>
-        {
-            clearViewAnimationClasses(nextView);
-        }, VIEW_ENTER_DURATION);
-    }, VIEW_EXIT_DELAY);
-}
-
 // Dieu huong bang hash giup chuyen man hinh ma khong tai lai toan bo ung dung.
 function navigateTo(viewName)
 {
-    const nextHash = viewName === "link" ? "#link" : viewName === "library" ? "#library" : viewName === "training" ? "#training" : "#check";
+    const nextHash =
+        viewName === "library"
+            ? "#library"
+            : viewName === "training"
+                ? "#training"
+                : "#check";
     if (window.location.hash !== nextHash)
     {
         window.location.hash = nextHash;
@@ -1432,10 +1606,7 @@ function navigateTo(viewName)
 
 function syncViewFromHash()
 {
-    if (window.location.hash === "#link")
-    {
-        setView("link");
-    } else if (window.location.hash === "#library")
+    if (window.location.hash === "#library")
     {
         setView("library");
     } else if (window.location.hash === "#training")
@@ -1456,7 +1627,7 @@ function normalizeScamLibrary(items)
                 name: String(item?.name || "Kiểu lừa đảo").trim(),
                 group: formatLibraryGroup(item?.group),
                 description: String(item?.description || "").trim(),
-                exampleMessage: String(item?.exampleMessage || "").trim()
+                exampleMessage: String(item?.exampleMessage || "").trim(),
             }))
             .filter((item) => item.name && item.description && item.exampleMessage)
             .slice(0, 15)
@@ -1484,7 +1655,9 @@ async function loadScamLibrary()
 
     try
     {
-        const response = await fetch("data/scam-library.json", { cache: "no-store" });
+        const response = await fetch("data/scam-library.json", {
+            cache: "no-store",
+        });
         if (!response.ok) throw new Error(`library ${response.status}`);
         scamLibrary = normalizeScamLibrary(await response.json());
         selectedLibraryId = scamLibrary[0]?.id || "";
@@ -1509,7 +1682,10 @@ function renderLibrary()
 
 function renderLibraryFilters()
 {
-    const groups = ["Tất cả", ...new Set(scamLibrary.map((item) => item.group).filter(Boolean))];
+    const groups = [
+        "Tất cả",
+        ...new Set(scamLibrary.map((item) => item.group).filter(Boolean)),
+    ];
     libraryFilters.innerHTML = "";
 
     groups.forEach((group) =>
@@ -1578,7 +1754,9 @@ function renderLibraryList()
 
 function renderLibraryDetail()
 {
-    const item = scamLibrary.find((entry) => entry.id === selectedLibraryId) || getFilteredLibraryItems()[0];
+    const item =
+        scamLibrary.find((entry) => entry.id === selectedLibraryId) ||
+        getFilteredLibraryItems()[0];
 
     if (!item)
     {
@@ -1635,7 +1813,10 @@ function normalizeTrainingMessages(items)
                 message: String(item?.message || "").trim(),
                 label: item?.label === "safe" ? "safe" : "scam",
                 category: String(item?.category || "Tổng hợp").trim(),
-                explanation: String(item?.explanation || "Hãy kiểm tra nguồn gửi, đường dẫn và yêu cầu trong tin nhắn.").trim()
+                explanation: String(
+                    item?.explanation ||
+                    "Hãy kiểm tra nguồn gửi, đường dẫn và yêu cầu trong tin nhắn.",
+                ).trim(),
             }))
             .filter((item) => item.message)
             .slice(0, TRAINING_POOL_COUNT)
@@ -1656,7 +1837,11 @@ function pickTrainingQuestions(pool)
 
 function renderTrainingIntroIfIdle()
 {
-    if (!trainingCard.classList.contains("hidden") || !trainingSummary.classList.contains("hidden")) return;
+    if (
+        !trainingCard.classList.contains("hidden") ||
+        !trainingSummary.classList.contains("hidden")
+    )
+        return;
     trainingIntro.classList.remove("hidden");
 }
 
@@ -1685,7 +1870,10 @@ function renderTrainingQuestion()
     trainingFeedback.className = "training-feedback hidden";
     trainingFeedback.innerHTML = "";
     nextTrainingBtn.classList.add("hidden");
-    nextTrainingBtn.textContent = trainingIndex === trainingItems.length - 1 ? "Xem tổng kết" : "Câu tiếp theo";
+    nextTrainingBtn.textContent =
+        trainingIndex === trainingItems.length - 1
+            ? "Xem tổng kết"
+            : "Câu tiếp theo";
     if (trainingAnswerButtons)
     {
         delete trainingAnswerButtons.dataset.choice;
@@ -1755,7 +1943,10 @@ function renderTrainingSummary()
     trainingIntro.classList.add("hidden");
     trainingSummary.classList.remove("hidden");
     trainingSummaryScore.textContent = `${trainingPoints}/${trainingItems.length} câu đúng`;
-    trainingSummaryComment.textContent = getTrainingSummaryComment(trainingPoints, trainingItems.length);
+    trainingSummaryComment.textContent = getTrainingSummaryComment(
+        trainingPoints,
+        trainingItems.length,
+    );
 }
 
 function getTrainingLabelText(label)
@@ -1766,9 +1957,12 @@ function getTrainingLabelText(label)
 function getTrainingSummaryComment(score, total = TRAINING_QUIZ_COUNT)
 {
     const ratio = total > 0 ? score / total : 0;
-    if (ratio >= 0.9) return "Rất tốt. Bạn nhận diện được hầu hết dấu hiệu nguy hiểm, đặc biệt là link lạ và yêu cầu chuyển tiền.";
-    if (ratio >= 0.7) return "Tốt. Bạn đã có nền khá chắc, chỉ cần cẩn thận hơn với tin có tên miền gần giống tổ chức thật.";
-    if (ratio >= 0.5) return "Ổn nhưng nên luyện thêm. Hãy chú ý các yếu tố: gấp gáp, phí nhỏ, OTP, link rút gọn và tên miền lạ.";
+    if (ratio >= 0.9)
+        return "Rất tốt. Bạn nhận diện được hầu hết dấu hiệu nguy hiểm, đặc biệt là link lạ và yêu cầu chuyển tiền.";
+    if (ratio >= 0.7)
+        return "Tốt. Bạn đã có nền khá chắc, chỉ cần cẩn thận hơn với tin có tên miền gần giống tổ chức thật.";
+    if (ratio >= 0.5)
+        return "Ổn nhưng nên luyện thêm. Hãy chú ý các yếu tố: gấp gáp, phí nhỏ, OTP, link rút gọn và tên miền lạ.";
     return "Cần luyện thêm. Trước khi làm theo tin nhắn, hãy dừng lại, kiểm tra nguồn gửi và hỏi người thân hoặc kênh chính thức.";
 }
 
@@ -1817,7 +2011,7 @@ function formatDate(value)
         hour: "2-digit",
         minute: "2-digit",
         day: "2-digit",
-        month: "2-digit"
+        month: "2-digit",
     }).format(new Date(value));
 }
 
@@ -1832,6 +2026,7 @@ function refreshHistory()
     {
         input.value = item.message;
         updateCounter();
+        updateLinkScan();
         renderResult(item.message, item.result, item.rawText);
         showMessage("Đã mở lại kết quả cũ, không gọi Gemini thêm.");
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1852,23 +2047,37 @@ async function runCheck()
 
     if (message.length > MAX_LENGTH)
     {
-        showMessage("Tin nhắn dài hơn 5000 ký tự. Bạn hãy rút gọn phần cần kiểm tra.", true);
+        showMessage(
+            "Tin nhắn dài hơn 5000 ký tự. Bạn hãy rút gọn phần cần kiểm tra.",
+            true,
+        );
         return;
     }
 
     setLoading(true);
     checkBtn.disabled = true;
+    latestAnalysis = null;
 
     try
     {
-        const rawText = await analyzeMessage(message);
-        const result = parseDetectiveResult(rawText);
-        renderResult(message, result, rawText);
-        addHistoryItem({ message, result, rawText, checkedAt: new Date().toISOString() });
+        const analysis = await analyzeWithPsychology(message);
+        latestAnalysis = analysis;
+
+        const result = analysis.detectiveResult;
+        const rawText = analysis.rawText;
+        renderResult(message, result, rawText, analysis.psychologyAdvice);
+        addHistoryItem({
+            message,
+            result,
+            rawText,
+            checkedAt: new Date().toISOString(),
+        });
         refreshHistory();
-        showMessage(result.usedFallback
-            ? "AI trả về dữ liệu chưa đúng cấu trúc, ScamCheck đã dùng kết quả dự phòng."
-            : "Đã phân tích xong.");
+        showMessage(
+            result.usedFallback
+                ? "AI trả về dữ liệu chưa đúng cấu trúc, ScamCheck đã dùng kết quả dự phòng."
+                : "Đã phân tích xong.",
+        );
     } catch (error)
     {
         // server.js mới trả kèm error.friendlyMessage khi có lý do cụ thể
@@ -1886,13 +2095,22 @@ async function runCheck()
             showMessage("Máy chủ chưa được cấu hình khóa Gemini.", true);
         } else if (text.includes("refused"))
         {
-            showMessage("AI từ chối phân tích nội dung này. Bạn có thể thử rút gọn hoặc bỏ thông tin nhạy cảm.", true);
+            showMessage(
+                "AI từ chối phân tích nội dung này. Bạn có thể thử rút gọn hoặc bỏ thông tin nhạy cảm.",
+                true,
+            );
         } else if (text.includes("timeout"))
         {
-            showMessage("Quá 30 giây chưa có kết quả. Bạn hãy thử lại sau ít phút.", true);
+            showMessage(
+                "Quá 30 giây chưa có kết quả. Bạn hãy thử lại sau ít phút.",
+                true,
+            );
         } else
         {
-            showMessage("Lỗi kết nối tới server. Hãy kiểm tra backend và file .env.", true);
+            showMessage(
+                "Lỗi kết nối tới server. Hãy kiểm tra backend và file .env.",
+                true,
+            );
         }
     } finally
     {
@@ -1907,6 +2125,7 @@ document.querySelectorAll("[data-sample]").forEach((button) =>
     {
         input.value = sampleMessages[button.dataset.sample] || "";
         updateCounter();
+        updateLinkScan();
         showMessage("Đã điền tin mẫu. Bạn có thể bấm Kiểm tra ngay.");
         input.focus();
     });
@@ -1915,27 +2134,15 @@ document.querySelectorAll("[data-sample]").forEach((button) =>
 listen(input, "input", () =>
 {
     updateCounter();
+    updateLinkScan();
 });
 listen(checkBtn, "click", runCheck);
 listen(clearBtn, "click", () =>
 {
     input.value = "";
     updateCounter();
+    updateLinkScan();
     input.focus();
-});
-
-listen(linkInput, "input", () =>
-{
-    updateLinkCounter();
-    updateLinkScan();
-});
-listen(linkClearBtn, "click", () =>
-{
-    if (!linkInput) return;
-    linkInput.value = "";
-    updateLinkCounter();
-    updateLinkScan();
-    linkInput.focus();
 });
 
 listen(clearHistoryBtn, "click", () =>
@@ -1957,14 +2164,17 @@ listen(tutorialModal, "click", (event) =>
 });
 listen(document, "keydown", (event) =>
 {
-    if (event.key === "Escape" && tutorialModal && !tutorialModal.classList.contains("hidden"))
+    if (
+        event.key === "Escape" &&
+        tutorialModal &&
+        !tutorialModal.classList.contains("hidden")
+    )
     {
         closeTutorial();
     }
 });
 
 listen(checkTab, "click", () => navigateTo("check"));
-listen(linkTab, "click", () => navigateTo("link"));
 listen(libraryTab, "click", () => navigateTo("library"));
 listen(trainingTab, "click", () => navigateTo("training"));
 listen(backToCheckBtn, "click", () => navigateTo("check"));
@@ -1978,7 +2188,8 @@ listen(nextTrainingBtn, "click", goToNextTrainingQuestion);
 
 listen(themeToggle, "click", () =>
 {
-    const current = document.documentElement.getAttribute("data-theme") || "light";
+    const current =
+        document.documentElement.getAttribute("data-theme") || "light";
     const next = current === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
     localStorage.setItem(THEME_STORAGE, next);
@@ -1989,35 +2200,81 @@ const savedTheme = localStorage.getItem(THEME_STORAGE) || "light";
 document.documentElement.setAttribute("data-theme", savedTheme);
 if (themeToggle) themeToggle.textContent = savedTheme === "dark" ? "☀" : "☾";
 updateCounter();
-updateLinkCounter();
 updateLinkScan();
 refreshHistory();
 syncViewFromHash();
 initializeTutorial();
 
-btnResponds.forEach(button => {
-    listen(button, "click", () => {
-        const choice = button.dataset.choice; // Lấy ra giá trị lựa chọn (none, clicked, transferred, otp)
-        const guideline = RESPONDER_GUIDELINES[choice]; // Lấy nội dung chỉ dẫn tương ứng
+btnResponds.forEach(button =>
+{
+    listen(button, "click", async () =>
+    {
+        const choice = button.dataset.choice;
+        const currentMessage = input.value.trim(); // Lấy nội dung tin nhắn lừa đảo hiện tại
 
-        if (guideline) {
-            // TIÊU CHÍ HOÀN THÀNH: Bấm một lựa chọn thì không cho bấm lại lựa chọn khác
-            // Chúng ta duyệt qua tất cả các nút và khóa cứng (disabled = true) chúng lại
-            btnResponds.forEach(btn => {
-                btn.disabled = true;
-                btn.classList.remove("active");
+        // Khóa tất cả các nút ngay khi được click để chống bấm đè/spam
+        btnResponds.forEach(btn =>
+        {
+            btn.disabled = true;
+            btn.classList.remove("active");
+        });
+
+        // Làm nổi bật nút đã click
+        button.classList.add("active");
+
+        // L5-05: Xử lý tình huống "Chưa làm gì" (Không gọi AI)
+        if (choice === "none")
+        {
+            responderGuidance.innerHTML = RESPONDER_GUIDELINES.none.text;
+            responderGuidance.className = `responder-guidance ${RESPONDER_GUIDELINES.none.class}`;
+            responderGuidance.classList.remove("hidden");
+            return; // Dừng tiến trình tại đây để tiết kiệm lượt gọi Gemini
+        }
+
+        // Hiện hiệu ứng tải khi đang liên hệ với AI Người ứng cứu (L5-03, L5-04)
+        responderGuidance.innerHTML = "<div class='spinner' style='width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;'></div> Đang lấy hướng dẫn khẩn cấp...";
+        responderGuidance.className = "responder-guidance";
+        responderGuidance.classList.remove("hidden");
+
+        try
+        {
+            const response = await fetch('/api/rescue', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: currentMessage, choice: choice })
             });
 
-            // Chỉ tô màu xanh nổi bật riêng cho nút mà người dùng vừa chọn
-            button.classList.add("active");
-
-            // Hiển thị nội dung hướng dẫn cứu hộ tương ứng ra màn hình
-            if (responderGuidance)
+            if (!response.ok)
             {
-                responderGuidance.innerHTML = guideline.text;
-                responderGuidance.className = `responder-guidance ${guideline.class}`; // Thêm class để đổi màu sắc
-                responderGuidance.classList.remove("hidden"); // Xóa lớp hidden để hiện nội dung lên mượt mà
+                throw new Error(`Lỗi server: ${response.status}`);
             }
+
+            const data = await response.json();
+
+            // Định dạng lại phản hồi từ AI để hiển thị đẹp hơn
+            // Chuyển ký tự xuống dòng \n thành thẻ <br>
+            let formattedText = data.text.replace(/\n/g, "<br>");
+
+            // Định dạng chữ in đậm dạng markdown **chữ** thành thẻ <strong>chữ</strong>
+            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+            responderGuidance.innerHTML = formattedText;
+
+            // Đổi màu nền đại diện tùy tình huống
+            if (choice === "clicked")
+            {
+                responderGuidance.className = "responder-guidance guidance-clicked";
+            }
+            else if (choice === "transferred" || choice === "otp")
+            {
+                responderGuidance.className = "responder-guidance guidance-otp";
+            }
+
+        } catch (error)
+        {
+            console.error("Lỗi lấy chỉ dẫn:", error);
+            responderGuidance.innerHTML = "⚠️ Lỗi kết nối hệ thống khi lấy hướng dẫn khẩn cấp. Bác hãy gọi ngay cho Ngân hàng để khóa tài khoản hoặc ra đồn Công an gần nhất để được hỗ trợ.";
+            responderGuidance.className = "responder-guidance guidance-otp";
         }
     });
 });
