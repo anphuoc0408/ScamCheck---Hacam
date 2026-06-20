@@ -2004,28 +2004,76 @@ refreshHistory();
 syncViewFromHash();
 initializeTutorial();
 
-btnResponds.forEach((button) => {
-  listen(button, "click", () => {
-    const choice = button.dataset.choice; // Lấy ra giá trị lựa chọn (none, clicked, transferred, otp)
-    const guideline = RESPONDER_GUIDELINES[choice]; // Lấy nội dung chỉ dẫn tương ứng
+btnResponds.forEach(button =>
+{
+    listen(button, "click", async () =>
+    {
+        const choice = button.dataset.choice;
+        const currentMessage = input.value.trim(); // Lấy nội dung tin nhắn lừa đảo hiện tại
 
-    if (guideline) {
-      // TIÊU CHÍ HOÀN THÀNH: Bấm một lựa chọn thì không cho bấm lại lựa chọn khác
-      // Chúng ta duyệt qua tất cả các nút và khóa cứng (disabled = true) chúng lại
-      btnResponds.forEach((btn) => {
-        btn.disabled = true;
-        btn.classList.remove("active");
-      });
+        // Khóa tất cả các nút ngay khi được click để chống bấm đè/spam
+        btnResponds.forEach(btn =>
+        {
+            btn.disabled = true;
+            btn.classList.remove("active");
+        });
 
-      // Chỉ tô màu xanh nổi bật riêng cho nút mà người dùng vừa chọn
-      button.classList.add("active");
+        // Làm nổi bật nút đã click
+        button.classList.add("active");
 
-      // Hiển thị nội dung hướng dẫn cứu hộ tương ứng ra màn hình
-      if (responderGuidance) {
-        responderGuidance.innerHTML = guideline.text;
-        responderGuidance.className = `responder-guidance ${guideline.class}`; // Thêm class để đổi màu sắc
-        responderGuidance.classList.remove("hidden"); // Xóa lớp hidden để hiện nội dung lên mượt mà
-      }
-    }
-  });
+        // L5-05: Xử lý tình huống "Chưa làm gì" (Không gọi AI)
+        if (choice === "none")
+        {
+            responderGuidance.innerHTML = RESPONDER_GUIDELINES.none.text;
+            responderGuidance.className = `responder-guidance ${RESPONDER_GUIDELINES.none.class}`;
+            responderGuidance.classList.remove("hidden");
+            return; // Dừng tiến trình tại đây để tiết kiệm lượt gọi Gemini
+        }
+
+        // Hiện hiệu ứng tải khi đang liên hệ với AI Người ứng cứu (L5-03, L5-04)
+        responderGuidance.innerHTML = "<div class='spinner' style='width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;'></div> Đang lấy hướng dẫn khẩn cấp...";
+        responderGuidance.className = "responder-guidance";
+        responderGuidance.classList.remove("hidden");
+
+        try
+        {
+            const response = await fetch('/api/rescue', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: currentMessage, choice: choice })
+            });
+
+            if (!response.ok)
+            {
+                throw new Error(`Lỗi server: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Định dạng lại phản hồi từ AI để hiển thị đẹp hơn
+            // Chuyển ký tự xuống dòng \n thành thẻ <br>
+            let formattedText = data.text.replace(/\n/g, "<br>");
+
+            // Định dạng chữ in đậm dạng markdown **chữ** thành thẻ <strong>chữ</strong>
+            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+            responderGuidance.innerHTML = formattedText;
+
+            // Đổi màu nền đại diện tùy tình huống
+            if (choice === "clicked")
+            {
+                responderGuidance.className = "responder-guidance guidance-clicked";
+            }
+            else if (choice === "transferred" || choice === "otp")
+            {
+                responderGuidance.className = "responder-guidance guidance-otp";
+            }
+
+        } catch (error)
+        {
+            console.error("Lỗi lấy chỉ dẫn:", error);
+            responderGuidance.innerHTML = "⚠️ Lỗi kết nối hệ thống khi lấy hướng dẫn khẩn cấp. Bác hãy gọi ngay cho Ngân hàng để khóa tài khoản hoặc ra đồn Công an gần nhất để được hỗ trợ.";
+            responderGuidance.className = "responder-guidance guidance-otp";
+        }
+    });
 });
