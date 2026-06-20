@@ -2038,6 +2038,7 @@ async function runCheck()
     const message = input.value.trim();
     showMessage("");
 
+    // 1. Kiểm tra tính hợp lệ của tin nhắn đầu vào
     if (!message)
     {
         showMessage("Bạn hãy dán nội dung tin nhắn trước khi kiểm tra.", true);
@@ -2054,18 +2055,29 @@ async function runCheck()
         return;
     }
 
+    // 2. LẬP TỨC ẨN KẾT QUẢ CŨ (Biến mất hoàn toàn chữ và ảnh cũ)
+    if (resultArea)
+    {
+        resultArea.classList.add("hidden");
+    }
+
+    // 3. BẬT TRẠNG THÁI ĐANG PHÂN TÍCH (Hiện spinner và chữ "Thám tử đang phân tích...")
     setLoading(true);
     checkBtn.disabled = true;
     latestAnalysis = null;
 
     try
     {
+        // Gửi dữ liệu lên hệ thống phân tích
         const analysis = await analyzeWithPsychology(message);
         latestAnalysis = analysis;
 
         const result = analysis.detectiveResult;
         const rawText = analysis.rawText;
+
+        // Hàm này sẽ tự động nạp kết quả mới và gọi resultArea.classList.remove("hidden") để hiển thị lại
         renderResult(message, result, rawText, analysis.psychologyAdvice);
+
         addHistoryItem({
             message,
             result,
@@ -2080,9 +2092,7 @@ async function runCheck()
         );
     } catch (error)
     {
-        // server.js mới trả kèm error.friendlyMessage khi có lý do cụ thể
-        // (ví dụ "AI từ chối phân tích vì lý do an toàn" / "...trùng lặp bản quyền").
-        // Ưu tiên hiển thị đúng lý do này trước khi rơi vào các thông báo chung.
+        // Xử lý các lỗi hiển thị nếu có sự cố kết nối
         if (error?.friendlyMessage)
         {
             showMessage(error.friendlyMessage, true);
@@ -2114,6 +2124,7 @@ async function runCheck()
         }
     } finally
     {
+        // 4. TẮT HIỆU ỨNG LOADING KHI HOÀN THÀNH
         setLoading(false);
         checkBtn.disabled = false;
     }
