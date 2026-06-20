@@ -1,0 +1,20 @@
+{
+  "banks": [
+    { "name": "Vietcombank", "hotline": "1900545413" },
+    { "name": "BIDV", "hotline": "19009247" },
+    { "name": "VietinBank", "hotline": "1900558868" },
+    { "name": "Agribank", "hotline": "1900558818" },
+    { "name": "Techcombank", "hotline": "1800588822" },
+    { "name": "MB Bank", "hotline": "1900545426" },
+    { "name": "ACB", "hotline": "1900545486" },
+    { "name": "Sacombank", "hotline": "1900555588" },
+    { "name": "VPBank", "hotline": "1900545415" },
+    { "name": "TPBank", "hotline": "1900585885" }
+  ],
+  "authorities": [
+    { "name": "Cục An toàn thông tin", "hotline": "156" },
+    { "name": "Đường dây nóng Bộ Công an", "hotline": "113" },
+    { "name": "Phòng An ninh mạng và PCTP sử dụng công nghệ cao - Hà Nội", "hotline": "0692194077" },
+    { "name": "Phòng An ninh mạng và PCTP sử dụng công nghệ cao - TP.HCM", "hotline": "0838387200" }
+  ]
+}

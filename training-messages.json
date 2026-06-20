@@ -1,0 +1,107 @@
+[
+  {
+    "id": "training-scam-bank-limit",
+    "message": "TK cua quy khach bi gioi han giao dich do dang nhap la. Xac minh trong 20 phut tai https://vietcombank-capnhat24h.com neu khong se tam khoa dich vu.",
+    "label": "scam",
+    "category": "Gia ngan hang",
+    "explanation": "Tin tao ap luc thoi gian, gan danh ngan hang va dua den ten mien la khong phai ten mien chinh thuc cua ngan hang."
+  },
+  {
+    "id": "training-safe-bank-warning",
+    "message": "Vietcombank khuyen cao khach hang khong cung cap OTP, mat khau cho bat ky ai. Neu nghi ngo, vui long goi tong dai in tren mat sau the hoac ung dung chinh thuc.",
+    "label": "safe",
+    "category": "Canh bao an toan",
+    "explanation": "Tin khong yeu cau bam link, khong doi OTP va huong nguoi nhan ve kenh chinh thuc."
+  },
+  {
+    "id": "training-scam-police-app",
+    "message": "Toi la dieu tra vien. So CCCD cua anh chi lien quan ho so rua tien. Tai ung dung lam viec tai http://congan-dieutra-hoso.net va nop tien bao lanh de tranh bi bat.",
+    "label": "scam",
+    "category": "Gia co quan cong an",
+    "explanation": "Co quan cong an khong yeu cau tai ung dung qua link la, nop tien bao lanh qua tin nhan hay giu bi mat voi nguoi than."
+  },
+  {
+    "id": "training-safe-family",
+    "message": "Me nho con toi nay ve som an com. Neu mua duoc thi ghe cho mua them it rau va sua tuoi.",
+    "label": "safe",
+    "category": "Tin ca nhan",
+    "explanation": "Noi dung doi thuong, khong co lien ket, khong yeu cau tien gap, OTP hay thong tin nhay cam."
+  },
+  {
+    "id": "training-scam-delivery-fee",
+    "message": "Don hang GH78320 thieu phi luu kho 18.000d. Thanh toan ngay tai https://ghn-thanhtoan-lephi.vip de duoc giao lai trong hom nay.",
+    "label": "scam",
+    "category": "Gia don vi giao hang",
+    "explanation": "Tin yeu cau tra phi nho qua ten mien la co gan ten don vi giao hang, day la cach lua dao rat pho bien."
+  },
+  {
+    "id": "training-safe-delivery",
+    "message": "Don hang cua ban du kien giao trong hom nay. Shipper se goi truoc khi den. Ban co the kiem tra ma van don tren ung dung mua hang da dat.",
+    "label": "safe",
+    "category": "Thong bao giao hang",
+    "explanation": "Tin chi thong bao trang thai giao hang, khong chen link la va khong yeu cau thanh toan hay cung cap thong tin rieng."
+  },
+  {
+    "id": "training-scam-prize-fee",
+    "message": "Chuc mung ban trung thuong xe may Vision. Vui long nop phi ho so 350.000d tai bit.ly/nhanxe2026 truoc 17h de giu suat nhan qua.",
+    "label": "scam",
+    "category": "Trung thuong",
+    "explanation": "Nguoi nhan khong tham gia chuong trinh nhung bi yeu cau nop phi truoc qua link rut gon, day la dau hieu lua dao."
+  },
+  {
+    "id": "training-safe-school",
+    "message": "Lop 12A1 hop phu huynh luc 19h30 thu Sau tai phong 203. Noi dung gom lich on thi va ke hoach tong ket hoc ky.",
+    "label": "safe",
+    "category": "Thong bao lop hoc",
+    "explanation": "Thong bao co thoi gian va dia diem ro rang, khong yeu cau chuyen tien gap hay truy cap duong dan bat thuong."
+  },
+  {
+    "id": "training-scam-job-task",
+    "message": "Nhan viec online luong 500k/ngay. Chuyen truoc 200k kich hoat tai khoan, sau 5 phut he thong hoan lai ca goc lan hoa hong.",
+    "label": "scam",
+    "category": "Viec lam gia",
+    "explanation": "Loi hua thu nhap cao bat thuong va yeu cau chuyen tien truoc la dau hieu cua lua dao viec lam, nhiem vu ao."
+  },
+  {
+    "id": "training-safe-electricity",
+    "message": "Hoa don tien dien thang nay da phat hanh. Gia dinh co the thanh toan qua ung dung ngan hang dang su dung hoac diem thu gan nha.",
+    "label": "safe",
+    "category": "Thong bao dich vu",
+    "explanation": "Tin chi nhac thanh toan qua cac kenh quen thuoc, khong gui link la hay doi thong tin dang nhap."
+  },
+  {
+    "id": "training-scam-investment-profit",
+    "message": "Dau tu goi AI loi nhuan 30% moi tuan. Nap toi thieu 1.000.000d vao vi rieng, cam ket hoan von trong 7 ngay neu khong co loi.",
+    "label": "scam",
+    "category": "Dau tu loi nhuan cao",
+    "explanation": "Cam ket loi nhuan cao, hoan von va yeu cau nap tien vao vi rieng la dau hieu lua dao dau tu."
+  },
+  {
+    "id": "training-safe-clinic",
+    "message": "Phong kham thong bao lich tai kham cua bac si Minh vao 8h30 ngay 20/06. Neu can doi lich, vui long goi so tong dai da in tren phieu hen.",
+    "label": "safe",
+    "category": "Thong bao y te",
+    "explanation": "Tin co noi dung hen lich ro rang, khong yeu cau bam link la, chuyen tien gap hay cung cap ma xac thuc."
+  },
+  {
+    "id": "training-scam-social-account",
+    "message": "Tai khoan Facebook cua ban bi to cao vi pham ban quyen. Xac minh chu so huu tai https://meta-baomat-page.com trong 12 gio neu khong page se bi khoa.",
+    "label": "scam",
+    "category": "Chiem tai khoan mang xa hoi",
+    "explanation": "Tin gia danh nen tang mang xa hoi, tao ap luc khoa tai khoan va dua den ten mien khong chinh thuc de lay mat khau."
+  },
+  {
+    "id": "training-safe-store-promo",
+    "message": "Cua hang da gui ma giam gia 10% cho don hang tiep theo. Ma co the nhap truc tiep trong ung dung mua hang, khong can cung cap thong tin ca nhan.",
+    "label": "safe",
+    "category": "Khuyen mai an toan",
+    "explanation": "Tin khuyen mai khong bat bam link, khong doi phi truoc va khong yeu cau thong tin dang nhap hay OTP."
+  },
+  {
+    "id": "training-scam-tax-refund",
+    "message": "Ho so hoan thue ca nhan cua ban duoc duyet 2.400.000d. Cap nhat so tai khoan nhan tien tai https://thue-hoantien-gov.com truoc 16h hom nay.",
+    "label": "scam",
+    "category": "Gia co quan nha nuoc",
+    "explanation": "Tin dung chu de hoan thue de du nguoi nhan vao ten mien gia mao co chu gov, nhung khong phai cong dich vu cong chinh thuc."
+  }
+]

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScamCheck | Kiểm tra lừa đảo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <div>
+                <p class="eyebrow">Trợ lý giáo dục</p>
+                <h1>ScamCheck</h1>
+            </div>
+            <div class="header-actions">
+                <nav class="view-tabs" aria-label="Điều hướng chính">
+                    <button id="checkTab" class="view-tab active" type="button" aria-controls="checkView">Kiểm tra</button>
+                    <button id="libraryTab" class="view-tab" type="button" aria-controls="libraryView">Thư viện</button>
+                    <button id="trainingTab" class="view-tab" type="button" aria-controls="trainingView">Luyện tập</button>
+                </nav>
+                <button id="tutorialOpenBtn" class="icon-button" type="button" aria-label="Mở hướng dẫn">?</button>
+                <button id="themeToggle" class="icon-button" type="button" aria-label="Đổi giao diện">☾</button>
+            </div>
+        </header>
+
+        <main>
+            <section id="checkView" class="app-view main-layout">
+                <section class="input-panel" aria-label="Kiểm tra tin nhắn">
+                    <label class="field-label" for="messageInput">Nội dung tin nhắn</label>
+                    <textarea id="messageInput" maxlength="5000" placeholder="Dán nội dung tin nhắn cần kiểm tra vào đây..."></textarea>
+                    <div class="meta-row">
+                        <span id="charCount">0/5000 ký tự</span>
+                        <button id="clearBtn" class="text-button" type="button">Xóa</button>
+                    </div>
+
+                    <section id="linkScanPanel" class="link-scan-panel" aria-label="Soi đường dẫn trong tin nhắn">
+                        <div class="section-title-row">
+                            <h2>Soi đường dẫn</h2>
+                            <span id="linkScanStatus" class="link-scan-status">Chưa có đường dẫn.</span>
+                        </div>
+                        <div id="linkScanList" class="link-scan-list"></div>
+                    </section>
+
+                    <div class="sample-buttons" aria-label="Tin mẫu">
+                        <button type="button" data-sample="bank">Tin giả ngân hàng</button>
+                        <button type="button" data-sample="police">Tin giả công an</button>
+                        <button type="button" data-sample="prize">Tin trúng thưởng</button>
+                    </div>
+
+                    <button id="checkBtn" class="primary-button" type="button">Kiểm tra</button>
+                    <p id="friendlyMessage" class="friendly-message" role="status"></p>
+                </section>
+
+                <section id="loadingArea" class="loading-area hidden" aria-live="polite">
+                    <div class="spinner"></div>
+                    <p>Thám tử đang phân tích...</p>
+                </section>
+
+                <section id="resultArea" class="result-area hidden" aria-label="Kết quả phân tích">
+                    <section class="result-section" aria-labelledby="detectiveResultTitle">
+                        <h2 id="detectiveResultTitle" class="result-section-title">🕵️ Phân tích kỹ thuật</h2>
+                        <div id="riskBadge" class="risk-badge">Đang chờ</div>
+                        <div class="result-grid">
+
+                            <article>
+                                <h2>Tin gốc</h2>
+                                <p id="highlightedMessage" class="message-preview"></p>
+                            </article>
+                            <article>
+                                <h2>Dấu hiệu</h2>
+                                <ul id="signList" class="clean-list"></ul>
+                            </article>
+                            <article>
+                                <h2>Việc nên làm</h2>
+                                <ol id="actionList" class="action-list"></ol>
+                            </article>
+                        </div>
+                    </section>
+                    <section class="result-section psychology-result" aria-labelledby="psychologyResultTitle">
+                        <h2 id="psychologyResultTitle" class="result-section-title">💬 Cô Tâm Lý</h2>
+                        <p id="psychologyAdvice" class="psychology-advice"></p>
+                    </section>
+                    <div id="responderQuestionArea" class="responder-box hidden">
+                        <div class="responder-header">
+                            <span class="responder-icon">🚨</span>
+                            <h3>Bác đã làm gì rồi?</h3>
+                        </div>
+                        <p class="responder-subtitle">Bác hãy chọn phương án đã thực hiện để nhận chỉ dẫn ứng phó an toàn phù hợp nhất:</p>
+                        
+                        <div class="responder-options" id="responderOptions">
+                            <!-- Mỗi nút được gán thuộc tính data-choice để phân biệt tình huống trong JS -->
+                            <button type="button" class="btn-respond" data-choice="none">Chưa làm gì</button>
+                            <button type="button" class="btn-respond" data-choice="clicked">Đã bấm vào đường dẫn</button>
+                            <button type="button" class="btn-respond" data-choice="transferred">Đã chuyển khoản tiền</button>
+                            <button type="button" class="btn-respond" data-choice="otp">Đã cung cấp mã OTP/Xác thực</button>
+                        </div>
+                        
+                        <!-- Nơi hiển thị văn bản chỉ dẫn tương ứng sau khi người dùng click -->
+                        <div id="responderGuidance" class="responder-guidance hidden"></div>
+                    </div>
+                    <details class="raw-box">
+                        <summary>Phản hồi của AI</summary>
+                        <pre id="rawResponse"></pre>
+                    </details>
+                    <article id="warningCardPanel" class="warning-card-panel hidden" aria-label="Thẻ cảnh báo chia sẻ">
+                        <div class="section-title-row">
+                            <h2>Thẻ cảnh báo</h2>
+                            <button id="downloadWarningCardBtn" class="secondary-button" type="button">Tải ảnh</button>
+                        </div>
+                        <canvas id="warningCardCanvas" class="warning-card-canvas" width="1080" height="1350"></canvas>
+                        <p id="warningCardStatus" class="hint">Ảnh tóm tắt có thể chia sẻ qua Zalo cho người thân.</p>
+                    </article>
+                </section>
+
+                <section class="history-section" aria-label="Lịch sử kiểm tra">
+                    <div class="section-title-row">
+                        <h2>Lịch sử gần đây</h2>
+                        <button id="clearHistoryBtn" class="text-button" type="button">Xóa lịch sử</button>
+                    </div>
+                    <div id="historyList" class="history-list"></div>
+                </section>
+            </section>
+
+            <section id="libraryView" class="app-view library-view hidden" aria-label="Thư viện kiểu lừa đảo">
+                <div class="library-toolbar">
+                    <div>
+                        <p class="eyebrow">Thư viện</p>
+                        <h2>Kiểu lừa đảo thường gặp</h2>
+                    </div>
+                    <button id="backToCheckBtn" class="secondary-button" type="button">Quay lại kiểm tra</button>
+                </div>
+
+                <div id="libraryFilters" class="library-filters" aria-label="Lọc theo nhóm"></div>
+                <p id="libraryStatus" class="friendly-message" role="status"></p>
+
+                <div class="library-layout">
+                    <div id="libraryList" class="library-list" aria-label="Danh sách kiểu lừa đảo"></div>
+                    <article id="libraryDetail" class="library-detail" aria-label="Chi tiết kiểu lừa đảo"></article>
+                </div>
+            </section>
+
+            <section id="trainingView" class="app-view training-view hidden" aria-label="Chế độ luyện tập">
+                <div class="training-toolbar">
+                    <div>
+                        <p class="eyebrow">Luyện tập</p>
+                        <h2>10 câu trong 15 tình huống</h2>
+                    </div>
+                    <button id="backFromTrainingBtn" class="secondary-button" type="button">Quay lại kiểm tra</button>
+                </div>
+
+                <p id="trainingStatus" class="friendly-message" role="status"></p>
+
+                <article id="trainingIntro" class="training-panel">
+                    <p>Mỗi lượt luyện tập chọn 10 tin ngẫu nhiên từ bộ 15 tình huống. Sau mỗi câu, ScamCheck hiển thị ngay giải thích để bạn luyện mắt nhận diện dấu hiệu.</p>
+                    <button id="startTrainingBtn" class="primary-button" type="button">Bắt đầu luyện tập</button>
+                </article>
+
+                <article id="trainingCard" class="training-panel hidden" aria-live="polite">
+                    <div class="training-progress-row">
+                        <span id="trainingProgress">Câu 1/10</span>
+                        <span id="trainingScore">0 điểm</span>
+                    </div>
+                    <p id="trainingMessage" class="training-message"></p>
+                    <div class="training-answer-buttons" aria-label="Chọn nhãn cho tin nhắn">
+                        <button id="guessScamBtn" type="button">Lừa đảo</button>
+                        <button id="guessSafeBtn" type="button">An toàn</button>
+                    </div>
+                    <div id="trainingFeedback" class="training-feedback hidden"></div>
+                    <button id="nextTrainingBtn" class="secondary-button hidden" type="button">Câu tiếp theo</button>
+                </article>
+
+                <article id="trainingSummary" class="training-panel hidden">
+                    <h3>Kết quả luyện tập</h3>
+                    <p id="trainingSummaryScore" class="training-summary-score"></p>
+                    <p id="trainingSummaryComment"></p>
+                    <button id="restartTrainingBtn" class="primary-button" type="button">Luyện lại</button>
+                </article>
+            </section>
+        </main>
+    </div>
+
+    <div id="tutorialModal" class="tutorial-modal hidden" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
+        <div class="tutorial-card">
+            <button id="tutorialCloseBtn" class="tutorial-close" type="button" aria-label="Đóng hướng dẫn">×</button>
+            <p class="eyebrow">Chào mừng</p>
+            <h2 id="tutorialTitle">Cách dùng ScamCheck</h2>
+            <div class="tutorial-steps">
+                <article>
+                    <strong>1. Dán tin nhắn</strong>
+                    <span>ScamCheck soi sẵn các đường dẫn và cảnh báo tên miền giả mạo trước khi bạn bấm link.</span>
+                </article>
+                <article>
+                    <strong>2. Bấm Kiểm tra</strong>
+                    <span>Kết quả có mức rủi ro, dấu hiệu chính, việc nên làm và thẻ cảnh báo để chia sẻ.</span>
+                </article>
+                <article>
+                    <strong>3. Luyện tập</strong>
+                    <span>Mỗi lượt lấy 10 câu từ bộ 15 tình huống để bạn nhận diện lừa đảo nhanh hơn.</span>
+                </article>
+            </div>
+            <button id="tutorialDoneBtn" class="primary-button" type="button">Đã hiểu, bắt đầu</button>
+        </div>
+    </div>
+
+    <footer class="legal-footer">
+        ScamCheck là công cụ giáo dục do nhóm học viên phát triển và không thay thế cảnh báo chính thức từ ngân hàng hoặc cơ quan chức năng.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

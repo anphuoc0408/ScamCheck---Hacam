@@ -1,0 +1,107 @@
+[
+  {
+    "id": "bank-account-lock",
+    "name": "Khóa tài khoản khẩn cấp",
+    "group": "GIẢ NGÂN HÀNG",
+    "description": "Kẻ lừa đảo giả danh ngân hàng, tạo cảm giác tài khoản đang gặp nguy hiểm để ép người nhận bấm vào liên kết và nhập thông tin đăng nhập hoặc mã OTP.",
+    "exampleMessage": "Tài khoản ngân hàng của quý khách đang bị khóa do phát hiện giao dịch bất thường. Vui lòng xác minh ngay tại https://secure-bank-capnhat.com trong 15 phút để tránh gián đoạn dịch vụ."
+  },
+  {
+    "id": "bank-otp-verification",
+    "name": "Yêu cầu cung cấp OTP",
+    "group": "GIẢ NGÂN HÀNG",
+    "description": "Tin nhắn yêu cầu người dùng gửi mã OTP, mã xác thực hoặc mật khẩu với lý do hỗ trợ giao dịch. Ngân hàng thật không yêu cầu khách hàng cung cấp OTP qua tin nhắn.",
+    "exampleMessage": "Giao dịch của bạn đang bị treo. Vui lòng gửi lại mã OTP vừa nhận được để nhân viên ngân hàng hoàn tất xác minh và mở khóa giao dịch."
+  },
+  {
+    "id": "bank-fee-refund",
+    "name": "Hoàn phí dịch vụ giả",
+    "group": "GIẢ NGÂN HÀNG",
+    "description": "Kẻ gian hứa hoàn phí, hoàn tiền hoặc nhận ưu đãi ngân hàng để dụ người nhận truy cập trang giả mạo và nhập thông tin thẻ.",
+    "exampleMessage": "Ngân hàng thông báo bạn được hoàn 680.000đ phí thường niên. Bấm vào https://refund-bank-vn.com và điền thông tin thẻ để nhận tiền trong hôm nay."
+  },
+  {
+    "id": "bank-fake-loan-approval",
+    "name": "Duyệt khoản vay giả",
+    "group": "GIẢ NGÂN HÀNG",
+    "description": "Tin nhắn thông báo được duyệt vay hoặc tăng hạn mức, sau đó yêu cầu đóng phí hồ sơ, phí bảo hiểm hoặc nhập thông tin tài khoản vào trang lạ.",
+    "exampleMessage": "Hồ sơ vay 50.000.000đ của anh/chị đã được duyệt. Vui lòng đóng phí bảo hiểm 450.000đ tại https://vaynhanh-bankvn.com để giải ngân trong 10 phút."
+  },
+  {
+    "id": "police-criminal-case",
+    "name": "Liên quan vụ án",
+    "group": "GIẢ CƠ QUAN CÔNG AN",
+    "description": "Đối tượng tự xưng là công an hoặc điều tra viên, nói người nhận liên quan đến vụ án để gây hoảng sợ và buộc chuyển tiền hoặc cung cấp thông tin cá nhân.",
+    "exampleMessage": "Chúng tôi là cơ quan công an. Số căn cước của anh/chị có liên quan đến đường dây rửa tiền. Không được báo cho ai và chuyển 30 triệu vào tài khoản tạm giữ để xác minh."
+  },
+  {
+    "id": "police-court-summons",
+    "name": "Giấy triệu tập giả",
+    "group": "GIẢ CƠ QUAN CÔNG AN",
+    "description": "Tin nhắn gửi đường dẫn hoặc tệp giả mạo giấy triệu tập, biên bản phạt hoặc lệnh điều tra nhằm khiến người nhận mở file độc hại hoặc làm theo hướng dẫn.",
+    "exampleMessage": "Bạn có giấy triệu tập khẩn cấp từ cơ quan điều tra. Tải hồ sơ tại https://congan-hoso-khan.com để xem lịch làm việc và xác nhận thông tin cá nhân."
+  },
+  {
+    "id": "police-sim-lock-warning",
+    "name": "Đe dọa khóa SIM vì vi phạm",
+    "group": "GIẢ CƠ QUAN CÔNG AN",
+    "description": "Kẻ lừa đảo gắn danh nghĩa cơ quan chức năng, nói số điện thoại vi phạm pháp luật hoặc sắp bị khóa để ép người nhận xác minh qua kênh giả.",
+    "exampleMessage": "Số thuê bao của bạn bị ghi nhận phát tán nội dung vi phạm. Bấm vào https://xacminh-congan24h.com để khai báo, nếu không SIM sẽ bị khóa sau 2 giờ."
+  },
+  {
+    "id": "police-fake-video-call",
+    "name": "Gọi video điều tra giả",
+    "group": "GIẢ CƠ QUAN CÔNG AN",
+    "description": "Đối tượng yêu cầu người nhận tham gia cuộc gọi video, giữ bí mật và quay màn hình giấy tờ, khuôn mặt hoặc ứng dụng ngân hàng để chiếm đoạt thông tin.",
+    "exampleMessage": "Anh/chị phải vào cuộc gọi video với điều tra viên ngay bây giờ. Chuẩn bị CCCD, mở ứng dụng ngân hàng và tuyệt đối không tắt máy trong quá trình xác minh."
+  },
+  {
+    "id": "prize-phone",
+    "name": "Trúng điện thoại giá trị cao",
+    "group": "TRÚNG THƯỞNG",
+    "description": "Tin nhắn thông báo trúng điện thoại, xe máy hoặc quà lớn dù người nhận không tham gia chương trình nào, thường yêu cầu đóng phí hồ sơ hoặc phí vận chuyển.",
+    "exampleMessage": "Chúc mừng thuê bao của bạn đã trúng iPhone 15 Pro Max. Vui lòng đóng phí hồ sơ 299.000đ tại https://nhanquangay-vip.com để nhận quà."
+  },
+  {
+    "id": "prize-cash-transfer",
+    "name": "Nhận tiền thưởng giả",
+    "group": "TRÚNG THƯỞNG",
+    "description": "Kẻ gian hứa chuyển khoản tiền thưởng nhưng yêu cầu người nhận nhập tài khoản, mật khẩu hoặc trả trước một khoản phí để mở quyền nhận thưởng.",
+    "exampleMessage": "Bạn đã trúng 20.000.000đ từ chương trình tri ân khách hàng. Xác nhận tài khoản nhận thưởng tại https://quatang-tienmat.com trước 18h hôm nay."
+  },
+  {
+    "id": "prize-lucky-spin",
+    "name": "Vòng quay may mắn giả",
+    "group": "TRÚNG THƯỞNG",
+    "description": "Tin nhắn mời tham gia vòng quay hoặc khảo sát nhận quà, sau đó dẫn đến trang yêu cầu thông tin cá nhân, phí nhận quà hoặc quyền truy cập tài khoản.",
+    "exampleMessage": "Bạn còn 1 lượt quay may mắn miễn phí để nhận quà từ hệ thống. Vào https://vongquay-trian.com và hoàn tất khảo sát để nhận phần thưởng."
+  },
+  {
+    "id": "delivery-address-fail",
+    "name": "Không giao được vì sai địa chỉ",
+    "group": "GIẢ ĐƠN VỊ GIAO HÀNG",
+    "description": "Đối tượng giả danh đơn vị vận chuyển, báo đơn hàng bị lỗi địa chỉ để dụ người nhận bấm link cập nhật thông tin hoặc thanh toán thêm phí.",
+    "exampleMessage": "Đơn hàng của bạn giao không thành công do thiếu số nhà. Vui lòng cập nhật địa chỉ tại https://giaohang-capnhat.com để tránh hoàn hàng."
+  },
+  {
+    "id": "delivery-extra-fee",
+    "name": "Yêu cầu thanh toán phí phát sinh",
+    "group": "GIẢ ĐƠN VỊ GIAO HÀNG",
+    "description": "Tin nhắn yêu cầu trả thêm phí lưu kho, phí hải quan hoặc phí giao lại với số tiền nhỏ, nhằm lấy thông tin thẻ hoặc ví điện tử.",
+    "exampleMessage": "Kiện hàng của bạn đang bị giữ tại kho do thiếu phí xử lý 18.000đ. Thanh toán tại https://ship-fee-vn.com trong hôm nay để tiếp tục giao hàng."
+  },
+  {
+    "id": "delivery-fake-tracking",
+    "name": "Mã vận đơn giả",
+    "group": "GIẢ ĐƠN VỊ GIAO HÀNG",
+    "description": "Kẻ lừa đảo gửi mã vận đơn hoặc trạng thái giao hàng giả để người nhận mở đường dẫn theo dõi, từ đó đánh cắp thông tin hoặc cài phần mềm độc hại.",
+    "exampleMessage": "Mã vận đơn GH938201 của bạn vừa cập nhật trạng thái. Xem chi tiết tại https://tracking-ghn-vn.com để xác nhận người nhận và thời gian giao."
+  },
+  {
+    "id": "delivery-customs-tax",
+    "name": "Phí hải quan đơn quốc tế giả",
+    "group": "GIẢ ĐƠN VỊ GIAO HÀNG",
+    "description": "Tin nhắn giả danh đơn vị giao hàng quốc tế, báo kiện bị giữ ở hải quan và yêu cầu đóng thuế hoặc phí mở kho qua đường dẫn không chính thức.",
+    "exampleMessage": "Bưu kiện quốc tế của bạn đang bị giữ tại hải quan. Đóng thuế 42.000đ tại https://customs-ship-vn.com để hoàn tất thông quan trong hôm nay."
+  }
+]
