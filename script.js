@@ -10,6 +10,7 @@ const MAX_HISTORY = 10;
 const MAX_LENGTH = 5000;
 const THEME_STORAGE = "scamcheck_theme";
 const TUTORIAL_STORAGE = "scamcheck_tutorial_seen";
+const PRODUCT_URL = "https://scamcheck-hacam.onrender.com/#check";
 const TRAINING_DATA_URL = "data/training-messages.json";
 const TRAINING_POOL_COUNT = 15;
 const TRAINING_QUIZ_COUNT = 10;
@@ -289,9 +290,11 @@ const rawResponse = document.getElementById("rawResponse");
 const friendlyMessage = document.getElementById("friendlyMessage");
 const historyList = document.getElementById("historyList");
 const checkView = document.getElementById("checkView");
+const linkView = document.getElementById("linkView");
 const libraryView = document.getElementById("libraryView");
 const viewTabs = document.querySelector(".view-tabs");
 const checkTab = document.getElementById("checkTab");
+const linkTab = document.getElementById("linkTab");
 const libraryTab = document.getElementById("libraryTab");
 const trainingTab = document.getElementById("trainingTab");
 const backToCheckBtn = document.getElementById("backToCheckBtn");
@@ -318,6 +321,9 @@ const trainingSummaryScore = document.getElementById("trainingSummaryScore");
 const trainingSummaryComment = document.getElementById("trainingSummaryComment");
 const restartTrainingBtn = document.getElementById("restartTrainingBtn");
 const linkScanPanel = document.getElementById("linkScanPanel");
+const linkInput = document.getElementById("linkInput");
+const linkCharCount = document.getElementById("linkCharCount");
+const linkClearBtn = document.getElementById("linkClearBtn");
 const linkScanStatus = document.getElementById("linkScanStatus");
 const linkScanList = document.getElementById("linkScanList");
 const warningCardPanel = document.getElementById("warningCardPanel");
@@ -342,6 +348,13 @@ let trainingItems = [];
 let trainingIndex = 0;
 let trainingPoints = 0;
 let trainingAnswered = false;
+const VIEW_NAMES = ["check", "link", "library", "training"];
+const VIEW_ORDER = { check: 0, link: 1, library: 2, training: 3 };
+const VIEW_EXIT_DELAY = 170;
+const VIEW_ENTER_DURATION = 430;
+let activeViewName = "check";
+let viewSwitchTimer = null;
+let viewEnterTimer = null;
 
 // Gemini is called only through the local backend so the API key never appears in the browser.
 async function analyzeMessage(message)
@@ -563,7 +576,8 @@ function updateLinkScan()
 {
     if (!linkScanPanel || !linkScanList || !linkScanStatus) return;
 
-    const links = extractLinksFromText(input.value);
+    const sourceText = linkInput ? linkInput.value : input.value;
+    const links = extractLinksFromText(sourceText);
     linkScanList.innerHTML = "";
 
     if (links.length === 0)
@@ -616,6 +630,23 @@ function updateLinkScan()
         `;
         linkScanList.appendChild(item);
     });
+}
+
+function updateLinkCounter()
+{
+    if (!linkInput || !linkCharCount) return;
+    linkCharCount.textContent = `${linkInput.value.length}/${MAX_LENGTH} ký tự`;
+}
+
+function prepareLinkScanner()
+{
+    if (linkInput && !linkInput.value.trim() && input?.value.trim())
+    {
+        linkInput.value = input.value;
+    }
+
+    updateLinkCounter();
+    updateLinkScan();
 }
 
 function extractLinksFromText(text)
@@ -1063,7 +1094,7 @@ async function renderWarningCard(message, result)
         if (!dryRun)
         {
             ctx.fillStyle = "#f1f5f9";
-            roundRect(ctx, 740, bottomStartY - 30, 230, 230, 18);
+            roundRect(ctx, 730, bottomStartY - 30, 250, 330, 18);
             ctx.fill();
 
             if (qrCanvas)
@@ -1079,11 +1110,14 @@ async function renderWarningCard(message, result)
             ctx.fillStyle = "#475569";
             ctx.font = "24px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
             ctx.textAlign = "center";
-            wrapTextDynamic(ctx, "Quét mã để mở ScamCheck", 855, bottomStartY + 235, 260, 32, 2, true);
+            wrapTextDynamic(ctx, "Quét mã để mở ScamCheck", 855, bottomStartY + 225, 230, 32, 2, true);
+            ctx.fillStyle = "#64748b";
+            ctx.font = "19px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            wrapTextDynamic(ctx, PRODUCT_URL.replace("https://", ""), 855, bottomStartY + 270, 220, 26, 2, true);
             ctx.textAlign = "left";
         }
 
-        const blockHeight = Math.max(50 + msgHeight, 280);
+        const blockHeight = Math.max(50 + msgHeight, 360);
         y += blockHeight + 70;
 
         if (!dryRun)
@@ -1133,11 +1167,7 @@ function getMainSignText(result)
 
 function getProductUrl()
 {
-    if (window.location.protocol === "file:")
-    {
-        return "https://github.com/jakenvni/Scamcheck";
-    }
-    return `${window.location.origin}${window.location.pathname}`;
+    return PRODUCT_URL;
 }
 
 async function createQrCanvas(text)
@@ -1265,36 +1295,132 @@ function renderHistory(history, onOpenItem)
     });
 }
 
-function setView(viewName)
+function getViewElement(viewName)
 {
+    if (viewName === "link") return linkView;
+    if (viewName === "library") return libraryView;
+    if (viewName === "training") return trainingView;
+    return checkView;
+}
+
+function getVisibleViewName()
+{
+    return VIEW_NAMES.find((name) =>
+    {
+        const view = getViewElement(name);
+        return view && !view.classList.contains("hidden");
+    }) || activeViewName;
+}
+
+function clearViewAnimationClasses(view)
+{
+    view?.classList.remove("view-enter-right", "view-enter-left", "view-exit-left", "view-exit-right");
+}
+
+function showOnlyView(viewName)
+{
+    VIEW_NAMES.forEach((name) =>
+    {
+        const view = getViewElement(name);
+        if (!view) return;
+        clearViewAnimationClasses(view);
+        view.classList.toggle("hidden", name !== viewName);
+    });
+}
+
+function updateViewTabs(viewName)
+{
+    const isLink = viewName === "link";
     const isLibrary = viewName === "library";
     const isTraining = viewName === "training";
-    if (viewTabs) viewTabs.dataset.active = isLibrary ? "library" : isTraining ? "training" : "check";
-    checkView?.classList.toggle("hidden", isLibrary || isTraining);
-    libraryView?.classList.toggle("hidden", !isLibrary);
-    trainingView?.classList.toggle("hidden", !isTraining);
-    checkTab?.classList.toggle("active", !isLibrary && !isTraining);
+    if (viewTabs) viewTabs.dataset.active = isLink ? "link" : isLibrary ? "library" : isTraining ? "training" : "check";
+    checkTab?.classList.toggle("active", !isLink && !isLibrary && !isTraining);
+    linkTab?.classList.toggle("active", isLink);
     libraryTab?.classList.toggle("active", isLibrary);
     trainingTab?.classList.toggle("active", isTraining);
-    checkTab?.setAttribute("aria-current", (!isLibrary && !isTraining) ? "page" : "false");
+    checkTab?.setAttribute("aria-current", (!isLink && !isLibrary && !isTraining) ? "page" : "false");
+    linkTab?.setAttribute("aria-current", isLink ? "page" : "false");
     libraryTab?.setAttribute("aria-current", isLibrary ? "page" : "false");
     trainingTab?.setAttribute("aria-current", isTraining ? "page" : "false");
+}
 
-    if (isLibrary)
+function prepareViewData(viewName)
+{
+    if (viewName === "link")
+    {
+        prepareLinkScanner();
+    }
+
+    if (viewName === "library")
     {
         loadScamLibrary();
     }
 
-    if (isTraining)
+    if (viewName === "training")
     {
         loadTrainingMessages();
     }
 }
 
+function setView(viewName)
+{
+    const nextViewName = VIEW_NAMES.includes(viewName) ? viewName : "check";
+    const previousViewName = getVisibleViewName();
+    const previousView = getViewElement(previousViewName);
+    const nextView = getViewElement(nextViewName);
+    const isSameView = previousViewName === nextViewName;
+
+    window.clearTimeout(viewSwitchTimer);
+    window.clearTimeout(viewEnterTimer);
+    VIEW_NAMES.forEach((name) => clearViewAnimationClasses(getViewElement(name)));
+
+    updateViewTabs(nextViewName);
+    prepareViewData(nextViewName);
+
+    if (!nextView)
+    {
+        return;
+    }
+
+    if (isSameView || !previousView || previousView.classList.contains("hidden"))
+    {
+        showOnlyView(nextViewName);
+        activeViewName = nextViewName;
+        return;
+    }
+
+    const movingForward = VIEW_ORDER[nextViewName] > VIEW_ORDER[previousViewName];
+    previousView.classList.add(movingForward ? "view-exit-left" : "view-exit-right");
+    activeViewName = nextViewName;
+
+    viewSwitchTimer = window.setTimeout(() =>
+    {
+        previousView.classList.add("hidden");
+        clearViewAnimationClasses(previousView);
+
+        VIEW_NAMES.forEach((name) =>
+        {
+            const view = getViewElement(name);
+            if (view && name !== nextViewName)
+            {
+                view.classList.add("hidden");
+            }
+        });
+
+        nextView.classList.remove("hidden");
+        nextView.classList.add(movingForward ? "view-enter-right" : "view-enter-left");
+
+        viewEnterTimer = window.setTimeout(() =>
+        {
+            clearViewAnimationClasses(nextView);
+        }, VIEW_ENTER_DURATION);
+    }, VIEW_EXIT_DELAY);
+}
+
 // Dieu huong bang hash giup chuyen man hinh ma khong tai lai toan bo ung dung.
 function navigateTo(viewName)
 {
-    const nextHash = viewName === "library" ? "#library" : viewName === "training" ? "#training" : "#check";
+    const nextHash = viewName === "link" ? "#link" : viewName === "library" ? "#library" : viewName === "training" ? "#training" : "#check";
     if (window.location.hash !== nextHash)
     {
         window.location.hash = nextHash;
@@ -1306,7 +1432,10 @@ function navigateTo(viewName)
 
 function syncViewFromHash()
 {
-    if (window.location.hash === "#library")
+    if (window.location.hash === "#link")
+    {
+        setView("link");
+    } else if (window.location.hash === "#library")
     {
         setView("library");
     } else if (window.location.hash === "#training")
@@ -1703,7 +1832,6 @@ function refreshHistory()
     {
         input.value = item.message;
         updateCounter();
-        updateLinkScan();
         renderResult(item.message, item.result, item.rawText);
         showMessage("Đã mở lại kết quả cũ, không gọi Gemini thêm.");
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1779,7 +1907,6 @@ document.querySelectorAll("[data-sample]").forEach((button) =>
     {
         input.value = sampleMessages[button.dataset.sample] || "";
         updateCounter();
-        updateLinkScan();
         showMessage("Đã điền tin mẫu. Bạn có thể bấm Kiểm tra ngay.");
         input.focus();
     });
@@ -1788,15 +1915,27 @@ document.querySelectorAll("[data-sample]").forEach((button) =>
 listen(input, "input", () =>
 {
     updateCounter();
-    updateLinkScan();
 });
 listen(checkBtn, "click", runCheck);
 listen(clearBtn, "click", () =>
 {
     input.value = "";
     updateCounter();
-    updateLinkScan();
     input.focus();
+});
+
+listen(linkInput, "input", () =>
+{
+    updateLinkCounter();
+    updateLinkScan();
+});
+listen(linkClearBtn, "click", () =>
+{
+    if (!linkInput) return;
+    linkInput.value = "";
+    updateLinkCounter();
+    updateLinkScan();
+    linkInput.focus();
 });
 
 listen(clearHistoryBtn, "click", () =>
@@ -1825,6 +1964,7 @@ listen(document, "keydown", (event) =>
 });
 
 listen(checkTab, "click", () => navigateTo("check"));
+listen(linkTab, "click", () => navigateTo("link"));
 listen(libraryTab, "click", () => navigateTo("library"));
 listen(trainingTab, "click", () => navigateTo("training"));
 listen(backToCheckBtn, "click", () => navigateTo("check"));
@@ -1849,6 +1989,7 @@ const savedTheme = localStorage.getItem(THEME_STORAGE) || "light";
 document.documentElement.setAttribute("data-theme", savedTheme);
 if (themeToggle) themeToggle.textContent = savedTheme === "dark" ? "☀" : "☾";
 updateCounter();
+updateLinkCounter();
 updateLinkScan();
 refreshHistory();
 syncViewFromHash();

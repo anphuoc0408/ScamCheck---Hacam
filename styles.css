@@ -16,7 +16,7 @@
     --highlight: #ffeb75;
     --shadow: 0 10px 30px rgba(24, 34, 48, 0.08);
     --motion: 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
-    --slider-motion: 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    --slider-motion: 520ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [data-theme="dark"] {
@@ -76,21 +76,26 @@ button {
 
 .app-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 16px;
     margin-bottom: 18px;
+    text-align: center;
 }
 
 .header-actions {
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 10px;
+    width: 100%;
 }
 
 .view-tabs {
     display: inline-grid;
-    grid-template-columns: repeat(3, minmax(88px, 1fr));
+    grid-template-columns: repeat(4, minmax(82px, 1fr));
     gap: 4px;
     position: relative;
     padding: 4px;
@@ -105,7 +110,7 @@ button {
     top: 4px;
     bottom: 4px;
     left: 4px;
-    width: calc((100% - 16px) / 3);
+    width: calc((100% - 20px) / 4);
     border-radius: 6px;
     background: var(--primary);
     transform: translateX(0);
@@ -113,12 +118,16 @@ button {
     will-change: transform;
 }
 
-.view-tabs[data-active="library"]::before {
+.view-tabs[data-active="link"]::before {
     transform: translateX(calc(100% + 4px));
 }
 
-.view-tabs[data-active="training"]::before {
+.view-tabs[data-active="library"]::before {
     transform: translateX(calc(200% + 8px));
+}
+
+.view-tabs[data-active="training"]::before {
+    transform: translateX(calc(300% + 12px));
 }
 
 .view-tab {
@@ -165,6 +174,10 @@ h2 {
 }
 
 .icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
     width: 48px;
     background: var(--panel);
     color: var(--text);
@@ -176,18 +189,65 @@ h2 {
     gap: 18px;
 }
 
-.app-view:not(.hidden) {
-    animation: viewSlideIn 320ms cubic-bezier(0.22, 1, 0.36, 1);
+.app-view.view-enter-right {
+    animation: viewGlideInRight 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@keyframes viewSlideIn {
+.app-view.view-enter-left {
+    animation: viewGlideInLeft 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.app-view.view-exit-left {
+    animation: viewGlideOutLeft 170ms ease-in both;
+    pointer-events: none;
+}
+
+.app-view.view-exit-right {
+    animation: viewGlideOutRight 170ms ease-in both;
+    pointer-events: none;
+}
+
+@keyframes viewGlideInRight {
     from {
         opacity: 0;
-        transform: translateX(12px);
+        transform: translateX(34px);
     }
     to {
         opacity: 1;
         transform: translateX(0);
+    }
+}
+
+@keyframes viewGlideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-34px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes viewGlideOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-18px);
+    }
+}
+
+@keyframes viewGlideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(18px);
     }
 }
 
@@ -294,9 +354,41 @@ input {
     background: var(--bg);
 }
 
+.link-view {
+    width: min(100%, 760px);
+    margin: 0 auto;
+}
+
+.link-scan-feature {
+    margin-top: 0;
+    padding: 18px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+}
+
+.link-feature-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.link-feature-head h2 {
+    margin: 0;
+}
+
+.link-scan-feature textarea {
+    min-height: 180px;
+}
+
 .link-scan-panel h2 {
     margin-bottom: 0;
     font-size: 1rem;
+}
+
+.link-scan-feature .link-feature-head h2 {
+    font-size: 1.35rem;
 }
 
 .link-scan-status {
@@ -999,8 +1091,17 @@ pre {
         padding-inline: 12px;
     }
 
-    .app-header,
-    .header-actions,
+    .app-header {
+        gap: 12px;
+    }
+
+    .header-actions {
+        display: grid;
+        grid-template-columns: 1fr 48px 48px 1fr;
+        gap: 8px;
+        align-items: center;
+    }
+
     .library-toolbar,
     .training-toolbar {
         align-items: stretch;
@@ -1008,17 +1109,47 @@ pre {
     }
 
     .view-tabs {
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         width: 100%;
+    }
+
+    .view-tab {
+        min-height: 42px;
+        padding: 6px 5px;
+        font-size: 0.86rem;
+    }
+
+    #tutorialOpenBtn {
+        grid-column: 2;
+    }
+
+    #themeToggle {
+        grid-column: 3;
+    }
+
+    .icon-button {
+        width: 48px;
+        min-height: 44px;
     }
 
     .sample-buttons {
         grid-template-columns: 1fr;
     }
 
+    .link-feature-head,
     .link-scan-head,
     .training-progress-row {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .link-scan-feature {
+        padding: 14px;
+    }
+
+    .link-scan-feature textarea {
+        min-height: 150px;
     }
 
     .training-answer-buttons {
@@ -1033,6 +1164,35 @@ pre {
         grid-template-columns: 1fr;
     }
 
+    .tutorial-modal {
+        align-items: start;
+        padding: 10px;
+    }
+
+    .tutorial-card {
+        width: 100%;
+        max-height: calc(100dvh - 20px);
+        padding: 18px 14px 14px;
+    }
+
+    .tutorial-card h2 {
+        padding-right: 42px;
+        font-size: 1.35rem;
+    }
+
+    .tutorial-close {
+        top: 10px;
+        right: 10px;
+    }
+
+    .tutorial-steps {
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .tutorial-steps article {
+        padding: 10px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
