@@ -17,11 +17,10 @@
             </div>
             <div class="header-actions">
                 <nav class="view-tabs" aria-label="Điều hướng chính">
-                    <button id="checkTab" class="view-tab active" type="button" aria-controls="checkView">Kiểm
-                        tra</button>
+                    <button id="checkTab" class="view-tab active" type="button" aria-controls="checkView">Kiểm tra</button>
+                    <button id="linkTab" class="view-tab" type="button" aria-controls="linkView">Soi link</button>
                     <button id="libraryTab" class="view-tab" type="button" aria-controls="libraryView">Thư viện</button>
-                    <button id="trainingTab" class="view-tab" type="button" aria-controls="trainingView">Luyện
-                        tập</button>
+                    <button id="trainingTab" class="view-tab" type="button" aria-controls="trainingView">Luyện tập</button>
                 </nav>
                 <button id="tutorialOpenBtn" class="icon-button" type="button" aria-label="Mở hướng dẫn">?</button>
                 <button id="themeToggle" class="icon-button" type="button" aria-label="Đổi giao diện">☾</button>
@@ -38,14 +37,6 @@
                         <span id="charCount">0/5000 ký tự</span>
                         <button id="clearBtn" class="text-button" type="button">Xóa</button>
                     </div>
-
-                    <section id="linkScanPanel" class="link-scan-panel" aria-label="Soi đường dẫn trong tin nhắn">
-                        <div class="section-title-row">
-                            <h2>Soi đường dẫn</h2>
-                            <span id="linkScanStatus" class="link-scan-status">Chưa có đường dẫn.</span>
-                        </div>
-                        <div id="linkScanList" class="link-scan-list"></div>
-                    </section>
 
                     <div class="sample-buttons" aria-label="Tin mẫu">
                         <button type="button" data-sample="bank">Tin giả ngân hàng</button>
@@ -131,6 +122,28 @@
                 </section>
             </section>
 
+            <section id="linkView" class="app-view link-view hidden" aria-label="Soi đường dẫn">
+                <section id="linkScanPanel" class="link-scan-panel link-scan-feature">
+                    <div class="link-feature-head">
+                        <div>
+                            <p class="eyebrow">Soi đường dẫn</p>
+                            <h2>Kiểm tra link trước khi bấm</h2>
+                        </div>
+                        <span id="linkScanStatus" class="link-scan-status">Chưa có đường dẫn.</span>
+                    </div>
+
+                    <label class="field-label" for="linkInput">Tin nhắn hoặc đường dẫn cần soi</label>
+                    <textarea id="linkInput" maxlength="5000"
+                        placeholder="Dán tin nhắn, link rút gọn hoặc tên miền nghi ngờ vào đây..."></textarea>
+                    <div class="meta-row">
+                        <span id="linkCharCount">0/5000 ký tự</span>
+                        <button id="linkClearBtn" class="text-button" type="button">Xóa</button>
+                    </div>
+
+                    <div id="linkScanList" class="link-scan-list"></div>
+                </section>
+            </section>
+
             <section id="libraryView" class="app-view library-view hidden" aria-label="Thư viện kiểu lừa đảo">
                 <div class="library-toolbar">
                     <div>
@@ -198,16 +211,16 @@
             <h2 id="tutorialTitle">Cách dùng ScamCheck</h2>
             <div class="tutorial-steps">
                 <article>
-                    <strong>1. Dán tin nhắn</strong>
-                    <span>ScamCheck soi sẵn các đường dẫn và cảnh báo tên miền giả mạo trước khi bạn bấm link.</span>
+                    <strong>1. Kiểm tra tin nhắn</strong>
+                    <span>Dán nội dung nghi ngờ rồi bấm Kiểm tra để xem mức rủi ro, dấu hiệu và việc nên làm.</span>
                 </article>
                 <article>
-                    <strong>2. Bấm Kiểm tra</strong>
-                    <span>Kết quả có mức rủi ro, dấu hiệu chính, việc nên làm và thẻ cảnh báo để chia sẻ.</span>
+                    <strong>2. Soi link riêng</strong>
+                    <span>Mở tab Soi link để kiểm tra đường dẫn rút gọn, tên miền giả mạo hoặc link giao hàng/ngân hàng đáng ngờ.</span>
                 </article>
                 <article>
-                    <strong>3. Luyện tập</strong>
-                    <span>Mỗi lượt lấy 10 câu từ bộ 15 tình huống để bạn nhận diện lừa đảo nhanh hơn.</span>
+                    <strong>3. Học và luyện tập</strong>
+                    <span>Thư viện cho biết các kiểu lừa đảo thường gặp, còn Luyện tập lấy 10 câu từ bộ 15 tình huống.</span>
                 </article>
             </div>
             <button id="tutorialDoneBtn" class="primary-button" type="button">Đã hiểu, bắt đầu</button>
