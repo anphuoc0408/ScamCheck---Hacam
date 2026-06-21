@@ -4,11 +4,11 @@
 
 ## Thành viên
 
-- An Phước
-- Quốc Hưng
-- Nguyễn Quân
+- Đào An Phước
+- Phạm Quốc Hưng
+- Nguyễn Minh Quân
 - Thân Quốc Hưng
-- Khánh An
+- Nguyễn Công Khánh An
 
 ## Công nghệ
 
