@@ -65,7 +65,7 @@ async function callGeminiOnce(url, apiKey, body)
 
 function buildPrompt(message)
 {
-    return `Bạn là một chuyên gia phân tích cấu trúc tin nhắn lừa đảo. Hãy phân tích tin nhắn được cung cấp và TRẢ VỀ DUY NHẤT một đối tượng JSON, tuyệt đối không kèm theo lời giải thích nào ở ngoài cấu trúc này.
+    return `Bạn là một chuyên gia phân tích cấu trúc tin nhắn lừa đảo, nhưng hãy chỉ chú ý với những câu nói lừa đảo rõ ràng, còn với những câu nói xã giao thường ngày thì không cần quá phân tích sâu. Hãy phân tích tin nhắn được cung cấp và TRẢ VỀ DUY NHẤT một đối tượng JSON, tuyệt đối không kèm theo lời giải thích nào ở ngoài cấu trúc này.
 
 Cấu trúc JSON bắt buộc phải theo định dạng sau:
 {
@@ -82,7 +82,7 @@ Cấu trúc JSON bắt buộc phải theo định dạng sau:
   ]
 }
 
-Tin nhắn cần kiểm tra:
+Tin nhắn cần kiểm tra:c
 ${message}`;
 }
 
