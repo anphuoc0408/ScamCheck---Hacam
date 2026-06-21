@@ -86,6 +86,7 @@ Tin nhắn cần kiểm tra:c
 ${message}`;
 }
 
+
 const PSYCHOLOGY_SYSTEM_PROMPT = `Bạn là nhân vật AI tên "Cô tâm lý" trong ứng dụng ScamCheck.
 
 Quy tắc bắt buộc:
