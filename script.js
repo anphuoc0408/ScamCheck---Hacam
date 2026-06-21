@@ -12,7 +12,7 @@ const MAX_HISTORY = 10;
 const MAX_LENGTH = 5000;
 const THEME_STORAGE = "scamcheck_theme";
 const TUTORIAL_STORAGE = "scamcheck_tutorial_seen";
-const PRODUCT_URL = "https://scamcheck-hacam.onrender.com/#check";
+const PRODUCT_URL = "https://scamcheck-hacam.onrender.com/";
 const TRAINING_DATA_URL = "data/training-messages.json";
 const TRAINING_POOL_COUNT = 15;
 const TRAINING_QUIZ_COUNT = 10;
@@ -533,11 +533,13 @@ let trainingAnswered = false;
 let latestAnalysis = null;
 const VIEW_NAMES = ["check", "link", "library", "training"];
 const VIEW_ORDER = { check: 0, link: 1, library: 2, training: 3 };
-const VIEW_EXIT_DELAY = 170;
-const VIEW_ENTER_DURATION = 430;
+const VIEW_EXIT_DELAY = 90;
+const VIEW_ENTER_DURATION = 580;
+const THEME_TRANSITION_DURATION = 900;
 let activeViewName = "check";
 let viewSwitchTimer = null;
 let viewEnterTimer = null;
+let themeSwitchTimer = null;
 
 // Gemini is called only through the local backend so the API key never appears in the browser.
 async function analyzeMessage(message)
@@ -819,6 +821,14 @@ function updateLinkCounter()
 {
     if (!linkInput || !linkCharCount) return;
     linkCharCount.textContent = `${linkInput.value.length}/${MAX_LENGTH} ký tự`;
+}
+
+function syncLinkScannerWithMessage(message)
+{
+    if (!linkInput) return;
+    linkInput.value = message || "";
+    updateLinkCounter();
+    updateLinkScan();
 }
 
 function prepareLinkScanner()
@@ -1139,8 +1149,11 @@ function renderResult(message, result, rawText, advice = null)
         actionList.appendChild(item);
     });
 
-    rawResponse.textContent =
-        typeof rawText === "string" ? rawText : JSON.stringify(rawText, null, 2);
+    if (rawResponse)
+    {
+        rawResponse.textContent =
+            typeof rawText === "string" ? rawText : JSON.stringify(rawText, null, 2);
+    }
     renderWarningCard(message, result);
 
     btnResponds.forEach((btn) =>
@@ -2176,6 +2189,7 @@ function refreshHistory()
     {
         input.value = item.message;
         updateCounter();
+        syncLinkScannerWithMessage(item.message);
         renderResult(item.message, item.result, item.rawText);
         showMessage("Đã mở lại kết quả cũ, không gọi Gemini thêm.");
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2203,6 +2217,8 @@ async function runCheck()
         );
         return;
     }
+
+    syncLinkScannerWithMessage(message);
 
     // 2. LẬP TỨC ẨN KẾT QUẢ CŨ (Biến mất hoàn toàn chữ và ảnh cũ)
     if (resultArea)
@@ -2358,19 +2374,40 @@ listen(guessScamBtn, "click", () => submitTrainingAnswer("scam"));
 listen(guessSafeBtn, "click", () => submitTrainingAnswer("safe"));
 listen(nextTrainingBtn, "click", goToNextTrainingQuestion);
 
+function setThemeToggleLabel(theme)
+{
+    if (themeToggle) themeToggle.textContent = theme === "dark" ? "☀" : "☾";
+}
+
+function applyTheme(theme)
+{
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem(THEME_STORAGE, theme);
+    setThemeToggleLabel(theme);
+}
+
 listen(themeToggle, "click", () =>
 {
     const current =
         document.documentElement.getAttribute("data-theme") || "light";
     const next = current === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem(THEME_STORAGE, next);
-    if (themeToggle) themeToggle.textContent = next === "dark" ? "☀" : "☾";
+
+    window.clearTimeout(themeSwitchTimer);
+    document.documentElement.classList.add("theme-switching");
+
+    themeSwitchTimer = window.setTimeout(() =>
+    {
+        applyTheme(next);
+
+        window.setTimeout(() =>
+        {
+            document.documentElement.classList.remove("theme-switching");
+        }, THEME_TRANSITION_DURATION);
+    }, 0);
 });
 
 const savedTheme = localStorage.getItem(THEME_STORAGE) || "light";
-document.documentElement.setAttribute("data-theme", savedTheme);
-if (themeToggle) themeToggle.textContent = savedTheme === "dark" ? "☀" : "☾";
+applyTheme(savedTheme);
 updateCounter();
 updateLinkCounter();
 updateLinkScan();
