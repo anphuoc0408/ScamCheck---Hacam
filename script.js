@@ -2483,11 +2483,7 @@ btnResponds.forEach(button =>
         } catch (error)
         {
             console.error("Lỗi lấy chỉ dẫn:", error);
-<<<<<<< HEAD
             responderGuidance.innerHTML = "⚠️ Lỗi kết nối hệ thống khi lấy hướng dẫn khẩn cấp. Bác hãy gọi ngay cho Ngân hàng để khóa tài khoản hoặc ra đồn Công an gần nhất để được hỗ trợ.";
-=======
-responderGuidance.innerHTML = "⚠️ Lỗi kết nối hệ thống khi lấy hướng dẫn khẩn cấp. Bác hãy gọi ngay cho Ngân hàng để khóa tài khoản hoặc ra đồn Công an gần nhất để được hỗ trợ.";
->>>>>>> 29929c2b441b4307a8adea7affc3016080b29085
             responderGuidance.className = "responder-guidance guidance-otp";
         }
     });
