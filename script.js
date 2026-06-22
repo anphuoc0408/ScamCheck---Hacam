@@ -535,7 +535,7 @@ async function analyzeMessage(message) {
       body: JSON.stringify({ message }),
     });
 
-    const data = await response.json().catch(() => ({}));
+    const data = await response.json().catch(() => ({}))
     if (!response.ok) {
       // Một số lỗi server trả kèm "message" thân thiện sẵn (ví dụ lý do bị
       // từ chối: SAFETY/RECITATION) - giữ nguyên message này thay vì chỉ
