@@ -4,9 +4,9 @@
     "private": true,
     "main": "server.js",
     "scripts": {
-        "start": "node server.js",
-        "local": "node local-server.js"
-    },
+    "start": "node local-server.js",
+    "local": "node local-server.js"
+    }
     "dependencies": {
         "cors": "^2.8.5",
         "dotenv": "^16.0.0",
